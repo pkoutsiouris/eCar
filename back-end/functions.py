@@ -1,11 +1,11 @@
 
-
+import mysql.connector
 
 def ConnectDB():
     try:
         # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
         conn = mysql.connector.connect(
-            host="localhost",
+            host="localhost:3306",
             user="root",
             password="",
             database="eCar_db"

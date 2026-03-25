@@ -1,4 +1,4 @@
-import mysql.connector
+
 import models
 def get_user_by_email(email):
     """
