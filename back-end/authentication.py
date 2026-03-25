@@ -1,5 +1,7 @@
 
-import models
+import classes
+import functions
+import mysql.connector
 def get_user_by_email(email):
     """
     Ψάχνει στη βάση δεδομένων να βρει τον χρήστη με το συγκεκριμένο email.
@@ -61,7 +63,7 @@ def authenticate_user(email, password):
         return False, "Βάλε ένα σωστό email (π.χ. @gmail.com).", None
 
     # 3. Ψάχνουμε τον χρήστη στη βάση μέσω του Model
-    user = User.get_user_by_email(email)
+    user = classes.User.get_user_by_email(email)
 
     if user is None:
         return False, "Ο χρήστης με αυτό το email δεν βρέθηκε.", None
