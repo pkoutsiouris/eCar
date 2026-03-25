@@ -1,3 +1,4 @@
+import mysql.connector
 
 import classes
 import functions
@@ -12,14 +13,14 @@ def get_user_by_email(email):
         conn = mysql.connector.connect(
             host="localhost", 
             user="root",
-            password="your_password", 
-            database="rentacar_db"
+            password="", 
+            database="eCar_db"
         )
         cursor = conn.cursor(dictionary=True)
         
         # Υποθέτουμε ότι ο πίνακας σας λέγεται 'users' 
         # και έχει στήλες: id, email, password, role
-        query = "SELECT id, email, password, role FROM users WHERE email = %s"
+        query = "SELECT user_id, email, user_password, user_role FROM users WHERE email = %s"
         cursor.execute(query, (email,))
         
         user = cursor.fetchone()
@@ -69,8 +70,8 @@ def authenticate_user(email, password):
         return False, "Ο χρήστης με αυτό το email δεν βρέθηκε.", None
 
     # 4. Ελέγχουμε τον κωδικό
-    if user['password'] == password:
+    if user['user_password'] == password:
         # Όλα πήγαν καλά! Στέλνουμε πίσω True, ένα μήνυμα, και τον ρόλο του.
-        return True, "Επιτυχής σύνδεση", user['role']
+        return True, "Επιτυχής σύνδεση", user['user_role']
     else:
         return False, "Λάθος κωδικός πρόσβασης.", None
