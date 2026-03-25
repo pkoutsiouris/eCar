@@ -14,7 +14,7 @@ car_description tinytext,
 fuel_type Enum('Gas', 'Diesel', 'Hybrid', 'Electric'),
 transmission_type enum('Mechanical', 'Auto'),
 horsepower int(4),
-image_path varchar(48),
+image_path varchar(255),
 price decimal(6,1) not null,
 availability boolean default true);  
 
@@ -24,9 +24,9 @@ user_role enum('Admin', 'Dealer', 'Customer') default 'Customer',
 first_name varchar(40) not null,
 surname varchar(40) not null,
 email varchar(39) unique,
-phone_number int(10),
+phone_number varchar(15),
 registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-license_number int(9) unique,
+license_number varchar(20) unique,
 license_type varchar(3));
  
  create table reservations(reservation_id int auto_increment primary key,
