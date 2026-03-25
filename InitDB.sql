@@ -36,5 +36,5 @@ license_type varchar(3));
  end_date datetime,
  total_price decimal(6,1),
  reservation_status varchar(21) not null,
- FOREIGN KEY (Car_ID) REFERENCES Cars(Car_ID) ON DELETE RESTRICT,
- FOREIGN KEY (User_ID) REFERENCES Users(User_ID) ON DELETE CASCADE);
+ FOREIGN KEY (Car_ID) REFERENCES cars(Car_ID) ON DELETE RESTRICT,
+ FOREIGN KEY (User_ID) REFERENCES users(User_ID) ON DELETE CASCADE);
