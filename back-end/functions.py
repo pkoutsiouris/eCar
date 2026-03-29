@@ -75,6 +75,54 @@ def CreateCar(car: classes.Car):
         db.close()
         conn.close()
 
+def FilterCars(price: float, year: int, cc: int , horses: int):
+    try:
+        conn,db=ConnectDB()
+        prflag=False
+        yrflag=False
+        ccflag=False
+        horseflag=False
+        query="select * from cars"
+        if price is not None:
+            query=" where "
+            prflag=True
+            query=query+" price='"+str(price)+"'"
+
+        if year is not None:
+            if prflag:
+                query=query+"and production_year='"+str(year)+"'"
+            else:
+                query=query+" production_year='"+str(year)+"'"
+            yrflag=True
+
+        if cc is not None:
+            if prflag or yrflag:
+                query=query + "and cc='"+str(cc)+"'"
+            else:
+                query=query + " cc='"+str(cc)+"'"
+            ccflag=True
+        if horses is not None:
+            if prflag or yrflag or ccflag:
+                query=query+" and horsepower='"+str(horses)+"'"
+            else:
+                query=query+" horsepower='"+str(horses)+"'"
+            horseflag=True
+            
+        query=query+";"
+        db.execute(query)
+        cars = db.fetchall()
+        return cars
+
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
+    
+
+#TODO update/cars, register  
+
 def CheckUserExists(user: classes.User):
     try:
         conn,db = ConnectDB()

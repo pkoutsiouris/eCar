@@ -37,15 +37,19 @@ class Car:
 
             
     
-# Η κύρια συνάρτηση που τρέχει το πρόγραμμα
+ # Η κύρια συνάρτηση που τρέχει το πρόγραμμα
 def main():
     print("Ξεκινάει η εφαρμογή...\n")
 
     # 2. Κλήση της μεθόδου που μιλάει με τη Βάση Δεδομένων (MySQL)
     print("\nΓίνεται κλήση στη βάση δεδομένων...")
     try:
+<<<<<<< HEAD
         """TEST
         car = functions.GetCars()
+=======
+        """ car = functions.GetCars()
+>>>>>>> 907bfc37f6420c0859fb8cf4d7db50cdeb443bf8
         print("From main ",car[2]) 
         car2 = Car( "Ford","Mustang",1969,"TES5",4,3273,"Available","Great car for showing off","Gas","Mechanical"
                    ,290,"/imgs/mustang.png",350.3,True
@@ -57,6 +61,7 @@ def main():
         if res:
             print("Car2 exists")
         else:
+<<<<<<< HEAD
             print("Car2 does not exist")"""
 
 
@@ -70,10 +75,15 @@ def main():
         else:
             print("User does not exist")
 TEST"""
+=======
+            print("Car2 does not exist") """
+        cars = functions.FilterCars(None,None,None,None)
+        print(cars)
+>>>>>>> 907bfc37f6420c0859fb8cf4d7db50cdeb443bf8
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
         print("(Σιγουρέψου ότι το MySQL server τρέχει και το αρχείο functions.py είναι σωστό!)")
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":
-    main()
+    main() 
