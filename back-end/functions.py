@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="8716",
+            password="root",
             database="eCar_db"
         )
         
@@ -66,6 +66,45 @@ def CreateCar(car: classes.Car):
         "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
         db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
                           car.desc,car.fuel,car.trans,car.horsepower,car.imgPath,car.price,car.availability))
+        conn.commit()
+        return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
+
+def CheckUserExists(user: classes.User):
+    try:
+        conn,db = ConnectDB()
+        query = "select * from users where email=%s"
+        db.execute(query,(user.email,))
+        res = db.fetchone()
+        if res is None:
+            return False
+        else:
+            return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
+
+def CreateUser(user: classes.User):
+    try:
+        conn,db = ConnectDB()
+        if CheckUserExists(user):
+            print("User already exists with email: " + user.email)  
+            return False
+        
+        query=" INSERT INTO users (user_password, " \
+        "user_role, first_name, surname, email, phone_number, " \
+        "license_number, license_type) VALUES (" \
+        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s)"
+        db.execute(query,(user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
+                          user.license_type))
         conn.commit()
         return True
     except mysql.connector.Error as err:
