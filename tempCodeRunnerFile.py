@@ -1,0 +1,582 @@
+import sys
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup
+)
+from PySide6.QtCore import Qt
+
+
+class MainDashboard(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Car Rental - Dashboard")
+        self.resize(1280, 820)
+
+        # ΜΟΝΟ 2 mock cars για preview
+        self.cars = [
+            {
+                "name": "Toyota Corolla",
+                "category": "Economy Sedan",
+                "doors": 4,
+                "seats": 5,
+                "transmission": "Automatic",
+                "fuel": "Petrol",
+                "branch": "Athens Center",
+                "status": "Available",
+                "year": 2022
+            },
+            {
+                "name": "Ford Fusion",
+                "category": "Full Size",
+                "doors": 4,
+                "seats": 5,
+                "transmission": "Automatic",
+                "fuel": "Hybrid",
+                "branch": "Athens Airport",
+                "status": "Reserved",
+                "year": 2023
+            }
+        ]
+
+        outer = QWidget()
+        self.setCentralWidget(outer)
+        outer_layout = QVBoxLayout(outer)
+        outer_layout.setContentsMargins(18, 18, 18, 18)
+        outer_layout.setSpacing(0)
+
+        outer.setStyleSheet("""
+            QWidget {
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #0d4fa3,
+                    stop:0.45 #1b6fd8,
+                    stop:1 #4fa3ff
+                );
+            }
+        """)
+
+        app_shell = QFrame()
+        app_shell.setObjectName("AppShell")
+        app_shell.setStyleSheet("""
+            QFrame#AppShell {
+                background-color: #f5f7fb;
+                border-radius: 18px;
+            }
+        """)
+
+        shell_layout = QHBoxLayout(app_shell)
+        shell_layout.setContentsMargins(0, 0, 0, 0)
+        shell_layout.setSpacing(0)
+
+        outer_layout.addWidget(app_shell)
+
+        # =========================
+        # Sidebar
+        # =========================
+        sidebar = QFrame()
+        sidebar.setFixedWidth(220)
+        sidebar.setStyleSheet("""
+            QFrame {
+                background-color: #101826;
+                border-top-left-radius: 18px;
+                border-bottom-left-radius: 18px;
+            }
+            QLabel {
+                background: transparent;
+            }
+            QPushButton {
+                text-align: left;
+                padding: 14px 20px;
+                border: none;
+                font-size: 14px;
+                font-weight: 600;
+                color: #b6c0cf;
+                background: transparent;
+                border-left: 3px solid transparent;
+            }
+            QPushButton:hover {
+                background-color: #182233;
+                color: white;
+            }
+            QPushButton:checked {
+                background-color: #253247;
+                color: white;
+                border-left: 3px solid #4ea1ff;
+            }
+        """)
+
+        sidebar_layout = QVBoxLayout(sidebar)
+        sidebar_layout.setContentsMargins(0, 22, 0, 18)
+        sidebar_layout.setSpacing(6)
+
+        logo_wrap = QWidget()
+        logo_layout = QVBoxLayout(logo_wrap)
+        logo_layout.setContentsMargins(18, 0, 18, 10)
+        logo_layout.setSpacing(2)
+
+        logo = QLabel("CarRental")
+        logo.setStyleSheet("""
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+        """)
+
+        logo_sub = QLabel("Frontend Preview")
+        logo_sub.setStyleSheet("""
+            color: #8ea0b9;
+            font-size: 12px;
+            font-weight: 500;
+        """)
+
+        logo_layout.addWidget(logo)
+        logo_layout.addWidget(logo_sub)
+        sidebar_layout.addWidget(logo_wrap)
+
+        self.nav_group = QButtonGroup(self)
+        self.nav_group.setExclusive(True)
+
+        btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
+        btn_cars = self.make_sidebar_button("Cars")
+        btn_reservations = self.make_sidebar_button("Reservations")
+        btn_users = self.make_sidebar_button("Users")
+        btn_reports = self.make_sidebar_button("Reports")
+        btn_settings = self.make_sidebar_button("Settings")
+
+        self.nav_group.addButton(btn_dashboard)
+        self.nav_group.addButton(btn_cars)
+        self.nav_group.addButton(btn_reservations)
+        self.nav_group.addButton(btn_users)
+        self.nav_group.addButton(btn_reports)
+        self.nav_group.addButton(btn_settings)
+
+        sidebar_layout.addWidget(btn_dashboard)
+        sidebar_layout.addWidget(btn_cars)
+        sidebar_layout.addWidget(btn_reservations)
+        sidebar_layout.addWidget(btn_users)
+        sidebar_layout.addWidget(btn_reports)
+        sidebar_layout.addWidget(btn_settings)
+        sidebar_layout.addStretch()
+
+        shell_layout.addWidget(sidebar)
+
+        # =========================
+        # Main content
+        # =========================
+        content = QWidget()
+        content.setStyleSheet("background-color: transparent;")
+        content_layout = QVBoxLayout(content)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+
+        shell_layout.addWidget(content)
+
+        # Banner
+        banner = QFrame()
+        banner.setFixedHeight(190)
+        banner.setStyleSheet("""
+            QFrame {
+                border-top-right-radius: 18px;
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #6ca8ff,
+                    stop:0.45 #3e84e8,
+                    stop:1 #1f5fbe
+                );
+            }
+        """)
+
+        banner_layout = QVBoxLayout(banner)
+        banner_layout.setContentsMargins(32, 24, 32, 24)
+        banner_layout.setSpacing(10)
+
+        banner_top = QHBoxLayout()
+        banner_top.setSpacing(10)
+
+        section_badge = QLabel("TRAVEL / RENTALS")
+        section_badge.setStyleSheet("""
+            background-color: rgba(255,255,255,0.16);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        """)
+
+        banner_top.addWidget(section_badge)
+        banner_top.addStretch()
+
+        title = QLabel("Available Cars")
+        title.setStyleSheet("""
+            color: white;
+            font-size: 34px;
+            font-weight: 800;
+            background: transparent;
+        """)
+
+        subtitle = QLabel("Browse vehicles, view availability and continue to reservation.")
+        subtitle.setStyleSheet("""
+            color: rgba(255,255,255,0.88);
+            font-size: 14px;
+            font-weight: 500;
+            background: transparent;
+        """)
+
+        stats_row = QHBoxLayout()
+        stats_row.setSpacing(12)
+        stats_row.addWidget(self.make_stat_chip("2 Cars"))
+        stats_row.addWidget(self.make_stat_chip("1 Available"))
+        stats_row.addWidget(self.make_stat_chip("1 Reserved"))
+        stats_row.addStretch()
+
+        banner_layout.addLayout(banner_top)
+        banner_layout.addStretch()
+        banner_layout.addWidget(title)
+        banner_layout.addWidget(subtitle)
+        banner_layout.addSpacing(8)
+        banner_layout.addLayout(stats_row)
+
+        content_layout.addWidget(banner)
+
+        # Toolbar
+        toolbar = QWidget()
+        toolbar.setFixedHeight(72)
+        toolbar.setStyleSheet("""
+            QWidget {
+                background-color: #ffffff;
+                border-bottom: 1px solid #e8edf5;
+            }
+        """)
+
+        toolbar_layout = QHBoxLayout(toolbar)
+        toolbar_layout.setContentsMargins(28, 0, 28, 0)
+        toolbar_layout.setSpacing(12)
+
+        left_info = QLabel("Sort by: <b>Recommended</b>")
+        left_info.setStyleSheet("""
+            color: #2b3547;
+            font-size: 14px;
+            background: transparent;
+        """)
+
+        right_info = QLabel("Showing <b>2</b> vehicles")
+        right_info.setStyleSheet("""
+            color: #556070;
+            font-size: 14px;
+            background: transparent;
+        """)
+
+        btn_filter = QPushButton("Filter")
+        btn_filter.setEnabled(False)  # frontend only
+        btn_filter.setStyleSheet("""
+            QPushButton {
+                background-color: #eef1f5;
+                color: #8a94a6;
+                border: 1px solid #dde3ec;
+                border-radius: 10px;
+                padding: 9px 16px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+        """)
+
+        btn_new = QPushButton("New Reservation")
+        btn_new.setEnabled(False)  # frontend only
+        btn_new.setStyleSheet("""
+            QPushButton {
+                background-color: #dbe3ef;
+                color: #7b8795;
+                border: none;
+                border-radius: 10px;
+                padding: 10px 18px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+        """)
+
+        toolbar_layout.addWidget(left_info)
+        toolbar_layout.addStretch()
+        toolbar_layout.addWidget(right_info)
+        toolbar_layout.addWidget(btn_filter)
+        toolbar_layout.addWidget(btn_new)
+
+        content_layout.addWidget(toolbar)
+
+        # Scroll area
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background-color: #f5f7fb;
+            }
+            QScrollBar:vertical {
+                background: #edf2f9;
+                width: 12px;
+                margin: 6px 2px 6px 2px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical {
+                background: #c7d3e4;
+                border-radius: 6px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #aebcd0;
+            }
+        """)
+
+        scroll_content = QWidget()
+        scroll_content.setStyleSheet("background-color: #f5f7fb;")
+
+        grid = QGridLayout(scroll_content)
+        grid.setContentsMargins(28, 24, 28, 28)
+        grid.setHorizontalSpacing(22)
+        grid.setVerticalSpacing(22)
+
+        row = 0
+        col = 0
+        for car in self.cars:
+            card = self.create_car_card(car)
+            grid.addWidget(card, row, col)
+
+            col += 1
+            if col > 2:
+                col = 0
+                row += 1
+
+        scroll.setWidget(scroll_content)
+        content_layout.addWidget(scroll)
+
+    def make_sidebar_button(self, text, checked=False):
+        btn = QPushButton(text)
+        btn.setCheckable(True)
+        btn.setChecked(checked)
+        btn.setCursor(Qt.PointingHandCursor)
+        btn.setMinimumHeight(46)
+        return btn
+
+    def make_stat_chip(self, text):
+        chip = QLabel(text)
+        chip.setStyleSheet("""
+            background-color: rgba(255,255,255,0.16);
+            color: white;
+            padding: 7px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        """)
+        return chip
+
+    def make_small_chip(self, text):
+        chip = QLabel(text)
+        chip.setStyleSheet("""
+            background-color: #f3f6fb;
+            color: #49576a;
+            border: 1px solid #e5ebf4;
+            padding: 5px 9px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 700;
+        """)
+        return chip
+
+    def create_car_card(self, car):
+        card = QFrame()
+        card.setMinimumHeight(305)
+        card.setMaximumHeight(305)
+        card.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border: 1px solid #e5ebf4;
+                border-radius: 16px;
+            }
+            QFrame:hover {
+                border: 1px solid #cfd9e8;
+            }
+        """)
+
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(18, 18, 18, 18)
+        layout.setSpacing(12)
+
+        top_row = QHBoxLayout()
+
+        name_wrap = QVBoxLayout()
+        name_wrap.setSpacing(2)
+
+        title = QLabel(car["name"])
+        title.setStyleSheet("""
+            color: #1d2736;
+            font-size: 18px;
+            font-weight: 800;
+            border: none;
+        """)
+
+        subtitle = QLabel(f'{car["category"]} • {car["year"]}')
+        subtitle.setStyleSheet("""
+            color: #6b7788;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+        """)
+
+        name_wrap.addWidget(title)
+        name_wrap.addWidget(subtitle)
+
+        status_badge = QLabel(car["status"])
+        if car["status"] == "Available":
+            status_style = """
+                background-color: #eafaf0;
+                color: #1f9d55;
+            """
+        elif car["status"] == "Reserved":
+            status_style = """
+                background-color: #fff4e6;
+                color: #d97706;
+            """
+        else:
+            status_style = """
+                background-color: #ffe9e9;
+                color: #dc2626;
+            """
+
+        status_badge.setStyleSheet(f"""
+            {status_style}
+            padding: 6px 10px;
+            border-radius: 11px;
+            font-size: 11px;
+            font-weight: 800;
+        """)
+
+        top_row.addLayout(name_wrap)
+        top_row.addStretch()
+        top_row.addWidget(status_badge)
+
+        image_box = QFrame()
+        image_box.setFixedHeight(92)
+        image_box.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #eef4fb,
+                    stop:1 #f8fbff
+                );
+                border: 1px solid #eef2f7;
+                border-radius: 12px;
+            }
+        """)
+
+        image_layout = QVBoxLayout(image_box)
+        image_layout.setContentsMargins(0, 0, 0, 0)
+
+        placeholder = QLabel("🚗")
+        placeholder.setAlignment(Qt.AlignCenter)
+        placeholder.setStyleSheet("""
+            font-size: 34px;
+            color: #5c6b7c;
+            background: transparent;
+        """)
+
+        image_layout.addWidget(placeholder)
+
+        chips_row = QHBoxLayout()
+        chips_row.setSpacing(8)
+
+        chips_row.addWidget(self.make_small_chip(f'{car["doors"]} Doors'))
+        chips_row.addWidget(self.make_small_chip(f'{car["seats"]} Seats'))
+        chips_row.addWidget(self.make_small_chip(car["transmission"]))
+        chips_row.addWidget(self.make_small_chip(car["fuel"]))
+        chips_row.addStretch()
+
+        info_wrap = QVBoxLayout()
+        info_wrap.setSpacing(4)
+
+        branch = QLabel(car["branch"])
+        branch.setStyleSheet("""
+            color: #263142;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+        """)
+
+        extra = QLabel("Vehicle details available • Mock frontend preview")
+        extra.setStyleSheet("""
+            color: #7a8799;
+            font-size: 11px;
+            border: none;
+        """)
+
+        info_wrap.addWidget(branch)
+        info_wrap.addWidget(extra)
+
+        bottom_row = QHBoxLayout()
+        bottom_row.setSpacing(10)
+
+        btn_details = QPushButton("Details")
+        btn_details.setCursor(Qt.PointingHandCursor)
+        btn_details.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                color: #334155;
+                border: 1px solid #d5deeb;
+                border-radius: 10px;
+                padding: 10px 16px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+            QPushButton:hover {
+                background-color: #f8fafc;
+            }
+        """)
+
+        btn_select = QPushButton("Select")
+        btn_select.setCursor(Qt.PointingHandCursor)
+
+        if car["status"] == "Available":
+            btn_select.setStyleSheet("""
+                QPushButton {
+                    background-color: #2563eb;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 10px 18px;
+                    font-size: 13px;
+                    font-weight: 800;
+                }
+                QPushButton:hover {
+                    background-color: #1d4ed8;
+                }
+            """)
+        else:
+            btn_select.setEnabled(False)
+            btn_select.setStyleSheet("""
+                QPushButton {
+                    background-color: #dbe3ef;
+                    color: #7b8795;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 10px 18px;
+                    font-size: 13px;
+                    font-weight: 800;
+                }
+            """)
+
+        bottom_row.addWidget(btn_details)
+        bottom_row.addStretch()
+        bottom_row.addWidget(btn_select)
+
+        layout.addLayout(top_row)
+        layout.addWidget(image_box)
+        layout.addLayout(chips_row)
+        layout.addLayout(info_wrap)
+        layout.addStretch()
+        layout.addLayout(bottom_row)
+
+        return card
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainDashboard()
+    window.show()
+    sys.exit(app.exec())
