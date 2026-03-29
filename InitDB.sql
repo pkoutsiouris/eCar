@@ -19,7 +19,7 @@ price decimal(6,1) not null,
 availability boolean default true);  
 
 create table users(user_id int(3) primary key auto_increment,
-user_password varchar(43) not null,
+user_password varchar(255) not null,
 user_role enum('Admin', 'Dealer', 'Customer') default 'Customer',
 first_name varchar(40) not null,
 surname varchar(40) not null,
