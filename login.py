@@ -1,274 +1,208 @@
 import sys
+import mysql.connector
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QMainWindow, QLabel, QLineEdit,
-    QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox,
-    QFrame, QSizePolicy
+    QApplication, QWidget, QLabel, QLineEdit, QPushButton,
+    QVBoxLayout, QFrame, QMessageBox
 )
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
-
-
-class MainMenuWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Car Rental - Main Menu")
-        self.resize(900, 550)
-
-        central = QWidget()
-        self.setCentralWidget(central)
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(20)
-        central.setLayout(layout)
-
-        title = QLabel("Main Menu")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("""
-            font-size: 28px;
-            font-weight: bold;
-            color: #1f2937;
-        """)
-
-        subtitle = QLabel("Προσωρινό μενού για να δεις ότι το login σε πάει σε άλλη οθόνη.")
-        subtitle.setAlignment(Qt.AlignCenter)
-        subtitle.setStyleSheet("""
-            font-size: 14px;
-            color: #6b7280;
-        """)
-
-        card = QFrame()
-        card.setStyleSheet("""
-            QFrame {
-                background-color: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 18px;
-            }
-        """)
-
-        card_layout = QVBoxLayout()
-        card_layout.setContentsMargins(30, 30, 30, 30)
-        card_layout.setSpacing(15)
-        card.setLayout(card_layout)
-
-        btn_users = QPushButton("Users")
-        btn_cars = QPushButton("Cars")
-        btn_reservations = QPushButton("Reservations")
-        btn_logout = QPushButton("Logout")
-
-        buttons = [btn_users, btn_cars, btn_reservations, btn_logout]
-
-        for btn in buttons:
-            btn.setMinimumHeight(48)
-            btn.setCursor(Qt.PointingHandCursor)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #2563eb;
-                    color: white;
-                    border: none;
-                    border-radius: 12px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    padding: 10px;
-                }
-                QPushButton:hover {
-                    background-color: #1d4ed8;
-                }
-                QPushButton:pressed {
-                    background-color: #1e40af;
-                }
-            """)
-
-        btn_users.clicked.connect(lambda: QMessageBox.information(self, "Users", "Εδώ αργότερα θα ανοίγει το Users window."))
-        btn_cars.clicked.connect(lambda: QMessageBox.information(self, "Cars", "Εδώ αργότερα θα ανοίγει το Cars window."))
-        btn_reservations.clicked.connect(lambda: QMessageBox.information(self, "Reservations", "Εδώ αργότερα θα ανοίγει το Reservations window."))
-        btn_logout.clicked.connect(self.handle_logout)
-
-        card_layout.addWidget(btn_users)
-        card_layout.addWidget(btn_cars)
-        card_layout.addWidget(btn_reservations)
-        card_layout.addSpacing(10)
-        card_layout.addWidget(btn_logout)
-
-        layout.addStretch()
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
-        layout.addWidget(card)
-        layout.addStretch()
-
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #f3f4f6;
-            }
-        """)
-
-    def handle_logout(self):
-        self.login_window = LoginWindow()
-        self.login_window.show()
-        self.close()
+from PySide6.QtGui import QPixmap
+from back_end import authentication as auth
+from main_user import MainDashboard
 
 
 class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Car Rental - Login")
-        self.resize(520, 420)
+        self.setWindowTitle("Car Rental Login")
+        
+        
 
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #f3f4f6;
-                font-family: Segoe UI, Arial, sans-serif;
-            }
-            QLineEdit {
-                background-color: white;
-                border: 1px solid #d1d5db;
-                border-radius: 10px;
-                padding: 12px;
-                font-size: 14px;
-            }
-            QLineEdit:focus {
-                border: 2px solid #2563eb;
-            }
-        """)
+        # 2. ΦΤΙΑΧΝΟΥΜΕ ΤΟ BACKGROUND ME QPIXMAP
+        self.bg_label = QLabel(self)
+        self.bg_label.lower() # Το στέλνουμε τέρμα πίσω, κάτω από όλα τα άλλα
+        self.original_pixmap = QPixmap('assets/bg.jpg') # Φορτώνουμε τη φωτογραφία
+
+        # MAIN LAYOUT
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        self.setLayout(main_layout)
+
+        # CONTAINER (Αφαιρέσαμε το παλιό background από εδώ για να μην εμποδίζει)
+        container = QWidget()
+        container.setStyleSheet("background: transparent;") 
+        main_layout.addWidget(container)
 
         outer_layout = QVBoxLayout()
-        outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setAlignment(Qt.AlignCenter)
-        self.setLayout(outer_layout)
+        outer_layout.setSpacing(18)
+        container.setLayout(outer_layout)
 
+        # LOGO TEXT
+        logo_label = QLabel("CAR RENTAL")
+        logo_label.setAlignment(Qt.AlignCenter)
+        logo_label.setStyleSheet("""
+            color: white;
+            font-size: 34px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            background: transparent;
+        """)
+
+        # LOGIN CARD
         card = QFrame()
-        card.setMaximumWidth(380)
-        card.setMinimumWidth(320)
-        card.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        card.setObjectName("MainCard")
+        card.setFixedWidth(390)
         card.setStyleSheet("""
-            QFrame {
-                background-color: white;
-                border-radius: 20px;
-                border: 1px solid #e5e7eb;
+            #MainCard {
+                background-color: rgba(255, 255, 255, 200);
+                border-radius: 24px;
             }
         """)
 
         card_layout = QVBoxLayout()
-        card_layout.setContentsMargins(28, 28, 28, 28)
-        card_layout.setSpacing(14)
+        card_layout.setContentsMargins(35, 30, 35, 30)
+        card_layout.setSpacing(16)
         card.setLayout(card_layout)
 
-        title = QLabel("Login")
+        title = QLabel("MEMBER LOGIN")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("""
-            font-size: 28px;
-            font-weight: bold;
-            color: #111827;
+            color: #334155;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            background: transparent;
         """)
-
-        subtitle = QLabel("Καλώς ήρθες στο Car Rental App")
-        subtitle.setAlignment(Qt.AlignCenter)
-        subtitle.setStyleSheet("""
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        """)
-
-        email_label = QLabel("Email")
-        email_label.setStyleSheet("font-size: 13px; color: #374151; font-weight: 600;")
 
         self.email_input = QLineEdit()
-        self.email_input.setPlaceholderText("γράψε email")
-        self.email_input.setMinimumHeight(44)
-
-        password_label = QLabel("Password")
-        password_label.setStyleSheet("font-size: 13px; color: #374151; font-weight: 600;")
+        self.email_input.setPlaceholderText("Enter email")
+        self.email_input.setMinimumHeight(46)
 
         self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("γράψε password")
+        self.password_input.setPlaceholderText("Enter password")
         self.password_input.setEchoMode(QLineEdit.Password)
-        self.password_input.setMinimumHeight(44)
+        self.password_input.setMinimumHeight(46)
 
-        self.login_button = QPushButton("Sign In")
-        self.login_button.setMinimumHeight(48)
-        self.login_button.setCursor(Qt.PointingHandCursor)
-        self.login_button.setStyleSheet("""
+        self.email_input.setStyleSheet("""
+            QLineEdit {
+                background-color: rgba(120, 120, 120, 80);
+                color: #1f2937;
+                border: none;
+                border-bottom: 2px solid #64748b;
+                padding: 12px;
+                font-size: 15px;
+            }
+            QLineEdit::placeholder {
+                color: #475569;
+            }
+            QLineEdit:focus {
+                background-color: rgba(120, 120, 120, 110);
+                border-bottom: 2px solid #22c55e;
+            }
+        """)
+
+        self.password_input.setStyleSheet("""
+            QLineEdit {
+                background-color: rgba(120, 120, 120, 80);
+                color: #1f2937;
+                border: none;
+                border-bottom: 2px solid #64748b;
+                padding: 12px;
+                font-size: 15px;
+            }
+            QLineEdit::placeholder {
+                color: #475569;
+            }
+            QLineEdit:focus {
+                background-color: rgba(120, 120, 120, 110);
+                border-bottom: 2px solid #22c55e;
+            }
+        """)
+
+        login_button = QPushButton("LOGIN")
+        login_button.setMinimumHeight(48)
+        login_button.setCursor(Qt.PointingHandCursor)
+        login_button.setStyleSheet("""
             QPushButton {
-                background-color: #2563eb;
+                background-color: #22c55e;
                 color: white;
                 border: none;
-                border-radius: 12px;
-                font-size: 15px;
+                border-radius: 8px;
+                font-size: 16px;
                 font-weight: bold;
-                padding: 10px;
             }
             QPushButton:hover {
-                background-color: #1d4ed8;
-            }
-            QPushButton:pressed {
-                background-color: #1e40af;
+                background-color: #16a34a;
             }
         """)
 
-        self.clear_button = QPushButton("Clear")
-        self.clear_button.setMinimumHeight(44)
-        self.clear_button.setCursor(Qt.PointingHandCursor)
-        self.clear_button.setStyleSheet("""
+        register_button = QPushButton("REGISTER")
+        register_button.setFixedWidth(290)
+        register_button.setMinimumHeight(48)
+        register_button.setCursor(Qt.PointingHandCursor)
+        register_button.setStyleSheet("""
             QPushButton {
-                background-color: #e5e7eb;
-                color: #111827;
-                border: none;
-                border-radius: 12px;
-                font-size: 14px;
-                font-weight: 600;
-                padding: 10px;
+                background-color: rgba(255, 255, 255, 90);
+                color: white;
+                border: 2px solid white;
+                border-radius: 14px;
+                font-size: 16px;
+                font-weight: 500;
             }
             QPushButton:hover {
-                background-color: #d1d5db;
+                background-color: rgba(255, 255, 255, 130);
             }
-        """)
-
-        button_row = QHBoxLayout()
-        button_row.setSpacing(10)
-        button_row.addWidget(self.clear_button)
-        button_row.addWidget(self.login_button)
-
-        demo_info = QLabel("Demo login: βάλε κάτι και στα 2 πεδία για να περάσεις στο main menu.")
-        demo_info.setWordWrap(True)
-        demo_info.setAlignment(Qt.AlignCenter)
-        demo_info.setStyleSheet("""
-            color: #6b7280;
-            font-size: 12px;
-            margin-top: 6px;
         """)
 
         card_layout.addWidget(title)
-        card_layout.addWidget(subtitle)
-        card_layout.addSpacing(6)
-        card_layout.addWidget(email_label)
+        card_layout.addSpacing(8)
         card_layout.addWidget(self.email_input)
-        card_layout.addWidget(password_label)
         card_layout.addWidget(self.password_input)
         card_layout.addSpacing(8)
-        card_layout.addLayout(button_row)
-        card_layout.addWidget(demo_info)
+        card_layout.addWidget(login_button)
 
-        outer_layout.addWidget(card)
+        outer_layout.addWidget(logo_label)
+        outer_layout.addWidget(card, alignment=Qt.AlignCenter)
+        outer_layout.addWidget(register_button, alignment=Qt.AlignCenter)
 
-        self.login_button.clicked.connect(self.handle_login)
-        self.clear_button.clicked.connect(self.clear_fields)
+   
+        outer_layout.addWidget(register_button, alignment=Qt.AlignCenter)
+        login_button.clicked.connect(self.handle_login)
+        register_button.clicked.connect(self.handle_register)
 
-    def clear_fields(self):
-        self.email_input.clear()
-        self.password_input.clear()
+        self.showMaximized()
+
+    # 3. Ο ΜΗΧΑΝΙΣΜΟΣ ΠΟΥ ΚΑΝΕΙ ΤΗΝ ΕΙΚΟΝΑ RESPONSIVE
+    def resizeEvent(self, event):
+        # Αυτή η συνάρτηση τρέχει αυτόματα κάθε φορά που αλλάζεις μέγεθος στο παράθυρο
+        if not self.original_pixmap.isNull():
+            # Κλιμακώνουμε την εικόνα στο νέο μέγεθος του παραθύρου
+            scaled_pixmap = self.original_pixmap.scaled(
+                self.size(), 
+                Qt.KeepAspectRatioByExpanding, # Κρατάει αναλογίες (σαν το CSS cover)
+                Qt.SmoothTransformation        # Κάνει απαλό ζουμ χωρίς να "πιξελιάζει"
+            )
+            self.bg_label.setPixmap(scaled_pixmap)
+            self.bg_label.resize(self.size()) # Το Label πιάνει όλο τον διαθέσιμο χώρο
+        super().resizeEvent(event)
 
     def handle_login(self):
         email = self.email_input.text().strip()
         password = self.password_input.text().strip()
+        response,message,role = auth.authenticate_user(email, password)
+        print(response)
+        if response:
+            QMessageBox.information(self, "Login Success", f"Welcome back! Your role is: {role}")
+        else:
+            QMessageBox.warning(self, "Login Failed", message)
+            
 
-        if not email or not password:
-            QMessageBox.warning(self, "Λείπουν πεδία", "Συμπλήρωσε και email και password.")
-            return
 
-        self.main_menu = MainMenuWindow()
-        self.main_menu.show()
-        self.close()
+       
 
+    def handle_register(self):
+        QMessageBox.information(self, "Register", "Temporary register screen.")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
