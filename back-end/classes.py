@@ -1,9 +1,9 @@
 import functions
 
 class User:
-    def __init__(self,uid: int,password: str, role: str, firstname: str ,
+    def __init__(self,password: str, role: str, firstname: str ,
                   surname:str,email: str, phone: int, license_no: int, license_type: str):
-        self.uid=uid
+        #self.uid=uid
         self.password=password
         self.role=role
         self.firstname=firstname
@@ -35,16 +35,19 @@ class Car:
 
         
 
-        
-        
+            
     
-# Η κύρια συνάρτηση που τρέχει το πρόγραμμα
+ # Η κύρια συνάρτηση που τρέχει το πρόγραμμα
 def main():
     print("Ξεκινάει η εφαρμογή...\n")
 
     # 2. Κλήση της μεθόδου που μιλάει με τη Βάση Δεδομένων (MySQL)
     print("\nΓίνεται κλήση στη βάση δεδομένων...")
     try:
+
+        """TEST
+        car = functions.GetCars()
+
         car = functions.GetCars()
         print("From main ",car[2]) 
         car2 = Car( "Ford","Mustang",1969,"TES5",4,3273,"Available","Great car for showing off","Gas","Mechanical"
@@ -57,11 +60,28 @@ def main():
         if res:
             print("Car2 exists")
         else:
+
             print("Car2 does not exist")
+
+
+        user2 = User("123", "Dealer", "Panagiois", "Katsioyris", "panagikat@yahoo.com", "69", "69", "B")
+        response = functions.CreateUser(user2)
+        print("From main ", response)
+
+        res = functions.CheckUserExists(user2)
+        if res:
+            print("User exists")
+        else:
+            print("User does not exist")
+        TEST 
+
+            print("Car2 does not exist") """
+        cars = functions.FilterCars(None,None,None,None)
+        print(cars)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
         print("(Σιγουρέψου ότι το MySQL server τρέχει και το αρχείο functions.py είναι σωστό!)")
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":
-    main()
+    main() 

@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="8716",
+            password="root",
             database="eCar_db"
         )
         
@@ -66,6 +66,93 @@ def CreateCar(car: classes.Car):
         "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
         db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
                           car.desc,car.fuel,car.trans,car.horsepower,car.imgPath,car.price,car.availability))
+        conn.commit()
+        return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
+
+def FilterCars(price: float, year: int, cc: int , horses: int):
+    try:
+        conn,db=ConnectDB()
+        prflag=False
+        yrflag=False
+        ccflag=False
+        horseflag=False
+        query="select * from cars"
+        if price is not None:
+            query=" where "
+            prflag=True
+            query=query+" price='"+str(price)+"'"
+
+        if year is not None:
+            if prflag:
+                query=query+"and production_year='"+str(year)+"'"
+            else:
+                query=query+" production_year='"+str(year)+"'"
+            yrflag=True
+
+        if cc is not None:
+            if prflag or yrflag:
+                query=query + "and cc='"+str(cc)+"'"
+            else:
+                query=query + " cc='"+str(cc)+"'"
+            ccflag=True
+        if horses is not None:
+            if prflag or yrflag or ccflag:
+                query=query+" and horsepower='"+str(horses)+"'"
+            else:
+                query=query+" horsepower='"+str(horses)+"'"
+            horseflag=True
+            
+        query=query+";"
+        db.execute(query)
+        cars = db.fetchall()
+        return cars
+
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
+    
+
+#TODO update/cars, register  
+
+def CheckUserExists(user: classes.User):
+    try:
+        conn,db = ConnectDB()
+        query = "select * from users where email=%s"
+        db.execute(query,(user.email,))
+        res = db.fetchone()
+        if res is None:
+            return False
+        else:
+            return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
+
+def CreateUser(user: classes.User):
+    try:
+        conn,db = ConnectDB()
+        if CheckUserExists(user):
+            print("User already exists with email: " + user.email)  
+            return False
+        
+        query=" INSERT INTO users (user_password, " \
+        "user_role, first_name, surname, email, phone_number, " \
+        "license_number, license_type) VALUES (" \
+        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s)"
+        db.execute(query,(user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
+                          user.license_type))
         conn.commit()
         return True
     except mysql.connector.Error as err:

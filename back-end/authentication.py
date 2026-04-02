@@ -1,5 +1,3 @@
-import mysql.connector
-
 import classes
 import functions
 
@@ -64,7 +62,7 @@ def authenticate_user(email, password):
         return False, "Βάλε ένα σωστό email (π.χ. @gmail.com).", None
 
     # 3. Ψάχνουμε τον χρήστη στη βάση μέσω του Model
-    user = classes.User.get_user_by_email(email)
+    user = get_user_by_email(email)
 
     if user is None:
         return False, "Ο χρήστης με αυτό το email δεν βρέθηκε.", None
@@ -75,3 +73,16 @@ def authenticate_user(email, password):
         return True, "Επιτυχής σύνδεση", user['user_role']
     else:
         return False, "Λάθος κωδικός πρόσβασης.", None
+    
+#test_main
+if __name__=="__main__":
+    print("--Testing--")
+
+    test_email="admin@gmail.com"
+    test_password="123"
+
+    success, message, role = authenticate_user(test_email, test_password)
+
+    print(f"Success: {success}")
+    print(f"Message: {message}")
+    print(f"Role: {role}")
