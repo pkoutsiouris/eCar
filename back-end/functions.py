@@ -161,3 +161,20 @@ def CreateUser(user: classes.User):
     finally:
         db.close()
         conn.close()
+
+def DeleteCar(car: classes.Car):
+    try:
+        conn,db = ConnectDB() 
+        if CheckCarExists(car):
+            print("Car doesn't exists")  
+            return False
+           
+        query = "delete from cars where car_id=%s"
+        db.execute(query,(car.car_id))
+        conn.commit()
+    except Exception as err:
+        print("Σφάλμα κατά τη διαγραφή: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
