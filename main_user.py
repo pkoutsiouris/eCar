@@ -1,4 +1,6 @@
 import sys
+from back_end import functions as func
+
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup
@@ -13,30 +15,7 @@ class MainDashboard(QMainWindow):
         self.resize(1280, 820)
 
         # ΜΟΝΟ 2 mock cars για preview
-        self.cars = [
-            {
-                "name": "Toyota Corolla",
-                "category": "Economy Sedan",
-                "doors": 4,
-                "seats": 5,
-                "transmission": "Automatic",
-                "fuel": "Petrol",
-                "branch": "Athens Center",
-                "status": "Available",
-                "year": 2022
-            },
-            {
-                "name": "Ford Fusion",
-                "category": "Full Size",
-                "doors": 4,
-                "seats": 5,
-                "transmission": "Automatic",
-                "fuel": "Hybrid",
-                "branch": "Athens Airport",
-                "status": "Reserved",
-                "year": 2023
-            }
-        ]
+        self.cars = func.GetCars()
 
         outer = QWidget()
         self.setCentralWidget(outer)
@@ -404,7 +383,7 @@ class MainDashboard(QMainWindow):
         name_wrap = QVBoxLayout()
         name_wrap.setSpacing(2)
 
-        title = QLabel(car["name"])
+        title = QLabel(car["brand"])
         title.setStyleSheet("""
             color: #1d2736;
             font-size: 18px;
@@ -412,7 +391,7 @@ class MainDashboard(QMainWindow):
             border: none;
         """)
 
-        subtitle = QLabel(f'{car["category"]} • {car["year"]}')
+        subtitle = QLabel(f'{car["production_year"]}')
         subtitle.setStyleSheet("""
             color: #6b7788;
             font-size: 12px;
@@ -423,13 +402,13 @@ class MainDashboard(QMainWindow):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
-        status_badge = QLabel(car["status"])
-        if car["status"] == "Available":
+        status_badge = QLabel(car["state"])
+        if car["state"] == "Available":
             status_style = """
                 background-color: #eafaf0;
                 color: #1f9d55;
             """
-        elif car["status"] == "Reserved":
+        elif car["state"] == "Reserved":
             status_style = """
                 background-color: #fff4e6;
                 color: #d97706;
@@ -482,22 +461,22 @@ class MainDashboard(QMainWindow):
         chips_row = QHBoxLayout()
         chips_row.setSpacing(8)
 
-        chips_row.addWidget(self.make_small_chip(f'{car["doors"]} Doors'))
+        #chips_row.addWidget(self.make_small_chip(f'{car["doors"]} Doors'))
         chips_row.addWidget(self.make_small_chip(f'{car["seats"]} Seats'))
-        chips_row.addWidget(self.make_small_chip(car["transmission"]))
-        chips_row.addWidget(self.make_small_chip(car["fuel"]))
+        chips_row.addWidget(self.make_small_chip(car["transmission_type"]))
+        chips_row.addWidget(self.make_small_chip(car["fuel_type"]))
         chips_row.addStretch()
 
         info_wrap = QVBoxLayout()
         info_wrap.setSpacing(4)
 
-        branch = QLabel(car["branch"])
-        branch.setStyleSheet("""
-            color: #263142;
-            font-size: 13px;
-            font-weight: 700;
-            border: none;
-        """)
+        #branch = QLabel(car["branch"])
+        #branch.setStyleSheet("""
+       #     color: #263142;
+       #     font-size: 13px;
+       #     font-weight: 700;
+       #     border: none;
+       # """)
 
         extra = QLabel("Vehicle details available • Mock frontend preview")
         extra.setStyleSheet("""
@@ -506,7 +485,7 @@ class MainDashboard(QMainWindow):
             border: none;
         """)
 
-        info_wrap.addWidget(branch)
+        #info_wrap.addWidget(branch)
         info_wrap.addWidget(extra)
 
         bottom_row = QHBoxLayout()
@@ -532,7 +511,7 @@ class MainDashboard(QMainWindow):
         btn_select = QPushButton("Select")
         btn_select.setCursor(Qt.PointingHandCursor)
 
-        if car["status"] == "Available":
+        if car["state"] == "Available":
             btn_select.setStyleSheet("""
                 QPushButton {
                     background-color: #2563eb;

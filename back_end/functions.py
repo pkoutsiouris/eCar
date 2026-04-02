@@ -1,6 +1,6 @@
 
 import mysql.connector
-import classes
+from . import classes
 
 def ConnectDB():
     try:
@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="root",
+            password="8716",
             database="eCar_db"
         )
         
