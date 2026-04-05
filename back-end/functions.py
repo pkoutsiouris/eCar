@@ -154,18 +154,18 @@ def CheckUserExists(user: classes.User):
         db.close()
         conn.close()
 
-def CreateUser(user: classes.User):
+def RegisterUser(user: classes.User):
     try:
         conn,db = ConnectDB()
         if CheckUserExists(user):
             print("User already exists with email: " + user.email)  
             return False
         
-        query=" INSERT INTO users (user_password, " \
+        query=" INSERT INTO users (username, user_password, " \
         "user_role, first_name, surname, email, phone_number, " \
         "license_number, license_type) VALUES (" \
-        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s)"
-        db.execute(query,(user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
+        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s,%s)"
+        db.execute(query,(user.username,user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
                           user.license_type))
         conn.commit()
         return True
