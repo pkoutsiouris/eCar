@@ -273,7 +273,7 @@ class MainDashboard(QMainWindow):
         btn_filter.setStyleSheet("""
             QPushButton {
                 background-color: #2563eb; 
-                color: white;              
+                color: white;         
                 border: none;
                 border-radius: 10px;
                 padding: 10px 16px;
@@ -282,15 +282,15 @@ class MainDashboard(QMainWindow):
             }
             
             QPushButton:hover {
-                /* Hover */
-                background-color: #1d4ed8; 
+                /* Hover (η κατάσταση όταν απλά περνάς το ποντίκι από πάνω χωρίς να κάνεις κλικ) */
+                background-color: #1d4ed8; /* Γίνεται ένα "κλικ" πιο σκούρο μπλε */
             }
             
             QPushButton:pressed {
-                /* Pressed */
                 background-color: #1e3a8a; 
                 padding-top: 12px;        
-                padding-bottom: 8px;      
+                padding-bottom: 8px;       
+               
             }
         """)
 
@@ -330,10 +330,6 @@ class MainDashboard(QMainWindow):
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: #f5f7fb;")
 
-       # grid = QGridLayout(scroll_content)
-       # grid.setContentsMargins(28, 24, 28, 28)
-       # grid.setHorizontalSpacing(22)
-       # grid.setVerticalSpacing(22)
 
         self.grid = QGridLayout(scroll_content)
         self.grid.setContentsMargins(28, 24, 28, 28)
