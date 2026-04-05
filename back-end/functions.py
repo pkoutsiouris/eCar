@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="root",
+            password="8716",
             database="eCar_db"
         )
         
@@ -84,7 +84,7 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         horseflag=False
         query="select * from cars"
         if price is not None:
-            query=" where "
+            query=query+ " where "
             prflag=True
             query=query+" price='"+str(price)+"'"
 
