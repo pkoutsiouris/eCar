@@ -1,6 +1,6 @@
 import classes
 import functions
-import mysql.connector
+
 def get_user_by_email(email):
     """
     Ψάχνει στη βάση δεδομένων να βρει τον χρήστη με το συγκεκριμένο email.

@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="root",
+            password="8716",
             database="eCar_db"
         )
         
@@ -98,7 +98,7 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         horseflag=False
         query="select * from cars"
         if price is not None:
-            query=" where "
+            query=query+ " where "
             prflag=True
             query=query+" price='"+str(price)+"'"
 
@@ -245,3 +245,21 @@ def GiveAdminAccess(email: str):
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
+        conn.close()
+
+def DeleteCar(car: classes.Car):
+    try:
+        conn,db = ConnectDB() 
+        if CheckCarExists(car):
+            print("Car doesn't exists")  
+            return False
+           
+        query = "delete from cars where car_id=%s"
+        db.execute(query,(car.car_id))
+        conn.commit()
+    except Exception as err:
+        print("Σφάλμα κατά τη διαγραφή: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
