@@ -76,11 +76,7 @@ class Car:
         self.availability=availability
         self.price=price
     
-
-        
-
-            
-    
+ 
  # Η κύρια συνάρτηση που τρέχει το πρόγραμμα
 def main():
     print("Ξεκινάει η εφαρμογή...\n")
@@ -107,6 +103,9 @@ def main():
 
             print("Car2 does not exist")
 
+        cars = functions.FilterCars(None,None,None,None)
+        print(cars)
+
 
         user2 = User("123", "Dealer", "Panagiois", "Katsioyris", "panagikat@yahoo.com", "69", "69", "B")
         response = functions.CreateUser(user2)
@@ -117,16 +116,35 @@ def main():
             print("User exists")
         else:
             print("User does not exist")
-        TEST 
 
-            print("Car2 does not exist") 
-        cars = functions.FilterCars(None,None,None,None)
-        print(cars) 
-    except Exception as e:
-        print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
-        print("(Σιγουρέψου ότι το MySQL server τρέχει και το αρχείο functions.py είναι σωστό!)") """
+        
+        print("Test 1: Get Users")
+        all_users = functions.GetUsers()
+        print(f"Found{len(all_users)} in database")
+        for u in all_users:
+            print(f" -> Email: {u['email']} | Ρόλος: {u['user_role']}")
 
-    # Δημιουργούμε το αντικείμενο στη μνήμη
+
+        print("--- ΤΕΣΤ 2: GiveAdminAccess ---")
+        test_email1="panagikat@yahoo.com"
+        test_email = "marisa@test.com" #email που δεν εχει καταχωρηθει
+        functions.GiveAdminAccess(test_email1)
+        functions.GiveAdminAccess(test_email)
+
+
+        print("--- ΤΕΣΤ 3: Επιβεβαίωση (Ξανά GetUsers) ---")
+        all_users_again = functions.GetUsers()
+        for u in all_users_again:
+            if u['email'] == test_email1:
+                print(f"Ο νέος ρόλος του {u['email']} στη βάση είναι πλέον: {u['user_role']}")
+
+
+        print("--- ΤΕΣΤ 4: GiveDealerAccess ---")
+        functions.GiveDealerAccess(test_email)
+
+
+
+        # Δημιουργούμε το αντικείμενο στη μνήμη
     new_customer = User(
         uid=None,  # Δεν ξέρουμε ακόμα το ID
         password="5n47/Rb", 
@@ -142,6 +160,14 @@ def main():
     # Καλούμε τη μέθοδο για να γράψουμε στη MySQL
     print("Προσπάθεια εγγραφής νέου χρήστη...")
     new_customer.RegisterUser()
+            
+TEST"""  
+        
+    except Exception as e:
+        print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
+        print("(Σιγουρέψου ότι το MySQL server τρέχει και το αρχείο functions.py είναι σωστό!)") """
+"""
+    
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":

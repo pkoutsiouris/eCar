@@ -245,7 +245,6 @@ def GiveAdminAccess(email: str):
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
-        conn.close()
 
 def DeleteCar(car: classes.Car):
     try:
