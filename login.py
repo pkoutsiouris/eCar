@@ -39,7 +39,7 @@ class LoginWindow(QWidget):
         container.setLayout(outer_layout)
 
         # LOGO TEXT
-        logo_label = QLabel("CAR RENTAL")
+        logo_label = QLabel("eCar")
         logo_label.setAlignment(Qt.AlignCenter)
         logo_label.setStyleSheet("""
             color: white;

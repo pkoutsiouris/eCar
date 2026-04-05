@@ -4,39 +4,22 @@ from PySide6.QtWidgets import (
     QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup
 )
 from PySide6.QtCore import Qt
-
+from back_end import functions
+from PySide6.QtGui import QPixmap
 
 class MainDashboard(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Car Rental - Dashboard")
         self.resize(1280, 820)
+        
+        # Τραβάμε τα αυτοκίνητα
+        db_cars = functions.GetCars()
 
-        # ΜΟΝΟ 2 mock cars για preview
-        self.cars = [
-            {
-                "name": "Toyota Corolla",
-                "category": "Economy Sedan",
-                "doors": 4,
-                "seats": 5,
-                "transmission": "Automatic",
-                "fuel": "Petrol",
-                "branch": "Athens Center",
-                "status": "Available",
-                "year": 2022
-            },
-            {
-                "name": "Ford Fusion",
-                "category": "Full Size",
-                "doors": 4,
-                "seats": 5,
-                "transmission": "Automatic",
-                "fuel": "Hybrid",
-                "branch": "Athens Airport",
-                "status": "Reserved",
-                "year": 2023
-            }
-        ]
+        if db_cars:
+            self.cars = db_cars
+        else:
+            self.cars = []
 
         outer = QWidget()
         self.setCentralWidget(outer)
@@ -102,7 +85,7 @@ class MainDashboard(QMainWindow):
                 background-color: #253247;
                 color: white;
                 border-left: 3px solid #4ea1ff;
-            }
+            }   
         """)
 
         sidebar_layout = QVBoxLayout(sidebar)
@@ -121,39 +104,24 @@ class MainDashboard(QMainWindow):
             font-weight: 800;
         """)
 
-        logo_sub = QLabel("Frontend Preview")
-        logo_sub.setStyleSheet("""
-            color: #8ea0b9;
-            font-size: 12px;
-            font-weight: 500;
-        """)
+       
 
         logo_layout.addWidget(logo)
-        logo_layout.addWidget(logo_sub)
         sidebar_layout.addWidget(logo_wrap)
 
         self.nav_group = QButtonGroup(self)
         self.nav_group.setExclusive(True)
 
         btn_dashboard = self.make_sidebar_button("Dashboard", checked=True)
-        btn_cars = self.make_sidebar_button("Cars")
         btn_reservations = self.make_sidebar_button("Reservations")
-        btn_users = self.make_sidebar_button("Users")
-        btn_reports = self.make_sidebar_button("Reports")
         btn_settings = self.make_sidebar_button("Settings")
 
         self.nav_group.addButton(btn_dashboard)
-        self.nav_group.addButton(btn_cars)
         self.nav_group.addButton(btn_reservations)
-        self.nav_group.addButton(btn_users)
-        self.nav_group.addButton(btn_reports)
         self.nav_group.addButton(btn_settings)
 
         sidebar_layout.addWidget(btn_dashboard)
-        sidebar_layout.addWidget(btn_cars)
         sidebar_layout.addWidget(btn_reservations)
-        sidebar_layout.addWidget(btn_users)
-        sidebar_layout.addWidget(btn_reports)
         sidebar_layout.addWidget(btn_settings)
         sidebar_layout.addStretch()
 
@@ -223,9 +191,8 @@ class MainDashboard(QMainWindow):
 
         stats_row = QHBoxLayout()
         stats_row.setSpacing(12)
-        stats_row.addWidget(self.make_stat_chip("2 Cars"))
-        stats_row.addWidget(self.make_stat_chip("1 Available"))
-        stats_row.addWidget(self.make_stat_chip("1 Reserved"))
+        stats_row.addWidget(self.make_stat_chip(f"{len(self.cars)} Cars"))
+        stats_row.addWidget(self.make_stat_chip("Available"))
         stats_row.addStretch()
 
         banner_layout.addLayout(banner_top)
@@ -258,7 +225,7 @@ class MainDashboard(QMainWindow):
             background: transparent;
         """)
 
-        right_info = QLabel("Showing <b>2</b> vehicles")
+        right_info = QLabel(f"Showing <b>{len(self.cars)}</b> vehicles")
         right_info.setStyleSheet("""
             color: #556070;
             font-size: 14px;
@@ -279,25 +246,12 @@ class MainDashboard(QMainWindow):
             }
         """)
 
-        btn_new = QPushButton("New Reservation")
-        btn_new.setEnabled(False)  # frontend only
-        btn_new.setStyleSheet("""
-            QPushButton {
-                background-color: #dbe3ef;
-                color: #7b8795;
-                border: none;
-                border-radius: 10px;
-                padding: 10px 18px;
-                font-size: 13px;
-                font-weight: 700;
-            }
-        """)
+    
 
         toolbar_layout.addWidget(left_info)
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(right_info)
         toolbar_layout.addWidget(btn_filter)
-        toolbar_layout.addWidget(btn_new)
 
         content_layout.addWidget(toolbar)
 
@@ -382,8 +336,13 @@ class MainDashboard(QMainWindow):
 
     def create_car_card(self, car):
         card = QFrame()
-        card.setMinimumHeight(305)
-        card.setMaximumHeight(305)
+        
+        # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 1/3 (Συνολικό Ύψος Κάρτας):
+        # Ήταν 305. Το κάναμε 360 για να δώσουμε χώρο στη νέα μεγαλύτερη φωτογραφία 
+        # και να μην πέφτουν τα γράμματα το ένα πάνω στο άλλο (overflow).
+        card.setMinimumHeight(360)
+        card.setMaximumHeight(360)
+        
         card.setStyleSheet("""
             QFrame {
                 background-color: white;
@@ -404,7 +363,7 @@ class MainDashboard(QMainWindow):
         name_wrap = QVBoxLayout()
         name_wrap.setSpacing(2)
 
-        title = QLabel(car["name"])
+        title = QLabel(f"{car['brand']} {car['model']}")
         title.setStyleSheet("""
             color: #1d2736;
             font-size: 18px;
@@ -412,7 +371,7 @@ class MainDashboard(QMainWindow):
             border: none;
         """)
 
-        subtitle = QLabel(f'{car["category"]} • {car["year"]}')
+        subtitle = QLabel(f'{car["cc"]} cc • {car["production_year"]}')
         subtitle.setStyleSheet("""
             color: #6b7788;
             font-size: 12px;
@@ -423,13 +382,13 @@ class MainDashboard(QMainWindow):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
-        status_badge = QLabel(car["status"])
-        if car["status"] == "Available":
+        status_badge = QLabel(car["state"])
+        if car["state"] == "Available":
             status_style = """
                 background-color: #eafaf0;
                 color: #1f9d55;
             """
-        elif car["status"] == "Reserved":
+        elif car["state"] == "Reserved":
             status_style = """
                 background-color: #fff4e6;
                 color: #d97706;
@@ -453,7 +412,12 @@ class MainDashboard(QMainWindow):
         top_row.addWidget(status_badge)
 
         image_box = QFrame()
-        image_box.setFixedHeight(92)
+        
+        # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 2/3 (Ύψος Γκρι Κουτιού): 
+        # Ήταν 92, το κάναμε 140. Αφού μεγαλώσαμε την κάρτα στο προηγούμενο βήμα,
+        # τώρα δίνουμε αυτόν τον έξτρα χώρο στο γκρι κουτί για να γίνει "καμβάς" για τη φωτό.
+        image_box.setFixedHeight(140) 
+        
         image_box.setStyleSheet("""
             QFrame {
                 background: qlineargradient(
@@ -468,30 +432,50 @@ class MainDashboard(QMainWindow):
 
         image_layout = QVBoxLayout(image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
+        
+        car_image = QLabel()
+        car_image.setAlignment(Qt.AlignCenter)
+        car_image.setStyleSheet("background: transparent; border: none;")
 
-        placeholder = QLabel("🚗")
-        placeholder.setAlignment(Qt.AlignCenter)
-        placeholder.setStyleSheet("""
-            font-size: 34px;
-            color: #5c6b7c;
-            background: transparent;
-        """)
+        img_path = car["image_path"].lstrip("/")
+        pixmap = QPixmap(img_path)
+    
+        if not pixmap.isNull():
+            
+            # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 3/3 (Aspect Ratio & Cropping):
+            # Ήταν KeepAspectRatio (που προσπαθούσε να χωρέσει όλη την εικόνα μικραίνοντάς την).
+            # Το κάναμε KeepAspectRatioByExpanding (μεγαλώνει την εικόνα για να γεμίσει ΠΛΗΡΩΣ το νέο 140άρι κουτί, 
+            # διατηρώντας όμως τις σωστές αναλογίες του αμαξιού για να μη βγει παραμορφωμένο).
+            scaled_pixmap = pixmap.scaled(
+                340, 140, 
+                Qt.KeepAspectRatioByExpanding, 
+                Qt.SmoothTransformation
+            )
+            
+            # ...και εδώ βάζουμε το car_image να κόψει "με το μαχαίρι" (Crop) 
+            # ό,τι περισσεύει από τα δεξιά/αριστερά, για να μην πέσει η εικόνα πάνω στα κουμπιά.
+            car_image.setFixedSize(340, 140) 
+            car_image.setPixmap(scaled_pixmap)
+            
+        else:
+            car_image.setText("🚗")
+            car_image.setStyleSheet("font-size: 34px; color: #5c6b7c; background: transparent;")
 
-        image_layout.addWidget(placeholder)
+        image_layout.addWidget(car_image, alignment=Qt.AlignCenter)
 
         chips_row = QHBoxLayout()
         chips_row.setSpacing(8)
 
         chips_row.addWidget(self.make_small_chip(f'{car["doors"]} Doors'))
         chips_row.addWidget(self.make_small_chip(f'{car["seats"]} Seats'))
-        chips_row.addWidget(self.make_small_chip(car["transmission"]))
-        chips_row.addWidget(self.make_small_chip(car["fuel"]))
+        chips_row.addWidget(self.make_small_chip(car["transmission_type"]))
+        chips_row.addWidget(self.make_small_chip(car["fuel_type"]))
         chips_row.addStretch()
 
         info_wrap = QVBoxLayout()
         info_wrap.setSpacing(4)
 
-        branch = QLabel(car["branch"])
+        branch = QLabel("Athens Center")
         branch.setStyleSheet("""
             color: #263142;
             font-size: 13px;
@@ -499,7 +483,7 @@ class MainDashboard(QMainWindow):
             border: none;
         """)
 
-        extra = QLabel("Vehicle details available • Mock frontend preview")
+        extra = QLabel("Vehicle details available")
         extra.setStyleSheet("""
             color: #7a8799;
             font-size: 11px;
@@ -510,7 +494,7 @@ class MainDashboard(QMainWindow):
         info_wrap.addWidget(extra)
 
         bottom_row = QHBoxLayout()
-        bottom_row.setSpacing(10)
+        bottom_row.setSpacing(15) # Βάλαμε λίγο παραπάνω κενό
 
         btn_details = QPushButton("Details")
         btn_details.setCursor(Qt.PointingHandCursor)
@@ -532,7 +516,7 @@ class MainDashboard(QMainWindow):
         btn_select = QPushButton("Select")
         btn_select.setCursor(Qt.PointingHandCursor)
 
-        if car["status"] == "Available":
+        if car["state"] == "Available":
             btn_select.setStyleSheet("""
                 QPushButton {
                     background-color: #2563eb;
@@ -561,8 +545,21 @@ class MainDashboard(QMainWindow):
                 }
             """)
 
+        # ΓΙΑΤΙ ΤΟ ΠΡΟΣΘΕΣΑΜΕ: Φτιάχνουμε το ταμπελάκι της τιμής 
+        # Τραβάει το car["price"] και του κολλάει το € και το / day
+        price_label = QLabel(f"€{car['price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>/ day</span>")
+        price_label.setStyleSheet("""
+            color: #1d2736;
+            font-size: 18px;
+            font-weight: 800;
+            background: transparent;
+        """)
+
         bottom_row.addWidget(btn_details)
         bottom_row.addStretch()
+        
+        # ΠΡΟΣΘΗΚΗ: Βάζουμε την τιμή δίπλα στο κουμπί Select!
+        bottom_row.addWidget(price_label) 
         bottom_row.addWidget(btn_select)
 
         layout.addLayout(top_row)
@@ -573,7 +570,6 @@ class MainDashboard(QMainWindow):
         layout.addLayout(bottom_row)
 
         return card
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
