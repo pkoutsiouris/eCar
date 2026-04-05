@@ -104,14 +104,14 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
 
         if year is not None:
             if prflag:
-                query=query+"and production_year='"+str(year)+"'"
+                query=query+" and production_year='"+str(year)+"'"
             else:
-                query=query+" production_year='"+str(year)+"'"
+                query=query+"production_year='"+str(year)+"'"
             yrflag=True
 
         if cc is not None:
             if prflag or yrflag:
-                query=query + "and cc='"+str(cc)+"'"
+                query=query + " and cc='"+str(cc)+"'"
             else:
                 query=query + " cc='"+str(cc)+"'"
             ccflag=True
@@ -249,13 +249,18 @@ def GiveAdminAccess(email: str):
 def DeleteCar(car: classes.Car):
     try:
         conn,db = ConnectDB() 
+
         if CheckCarExists(car):
             print("Car doesn't exists")  
             return False
            
-        query = "delete from cars where car_id=%s"
+        query = "delete from cars where licence_plate=%s"
         db.execute(query,(car.car_id))
         conn.commit()
+
+        print(f"Επιτυχία: Το αυτοκίνητο {car.plate} διαγράφηκε.")
+        return True
+
     except Exception as err:
         print("Σφάλμα κατά τη διαγραφή: {err}")   
         return False
