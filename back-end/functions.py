@@ -149,8 +149,10 @@ def CheckUserExists(user: classes.User):
         print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def RegisterUser(user: classes.User):
     try:
@@ -171,8 +173,10 @@ def RegisterUser(user: classes.User):
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
         return False
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GiveDealerAccess(email: str):
     try:
