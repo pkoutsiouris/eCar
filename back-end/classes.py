@@ -29,11 +29,11 @@ class User:
         
         # Τα δεδομένα του χρήστη σε μορφή tuple
         values = (
+            self.password,
             self.role, 
             self.firstname, 
             self.surname, 
-            self.email, 
-            self.password,
+            self.email,
             self.phone, 
             self.license_no, 
             self.license_type

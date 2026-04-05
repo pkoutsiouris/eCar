@@ -9,7 +9,6 @@ def ConnectDB():
             host="localhost",
             user="root",
             password="",
-            password="8716",
             database="eCar_db"
         )
         
