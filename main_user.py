@@ -384,10 +384,15 @@ class MainDashboard(QMainWindow):
                 else:
                     filtered = functions.FilterCars(price, year, cc, hp)
                 
-                print("Φιλτραρισμένα αυτοκίνητα:", filtered)  # Debug print για να δούμε τι επιστρέφει η βάση
-                self.update_grid(filtered)
+                if isinstance(filtered, list): # elegxos an oti hr8e apo thn DB einai sthn List
+                    self.update_grid(filtered)
+                else:
+                    print(f"funtions.py den esteile thn lista {filtered}")
+                    self.update_grid([]) # an den esteile lista, emfanise keno
             except ValueError:
-                print("Σφάλμα: Παρακαλώ εισάγετε μόνο νούμερα στα φίλτρα.")
+                print("Error please enter only numbers!")
+          
+            
 
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
