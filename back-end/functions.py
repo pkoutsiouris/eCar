@@ -8,8 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
-            password="8716",
+            password="root",
             database="eCar_db"
         )
         
@@ -263,3 +262,35 @@ def DeleteCar(car: classes.Car):
     finally:
         db.close()
         conn.close()
+
+
+def GetSortedCars(sort_by: str, descending: bool = False):
+    try:
+        conn, db = ConnectDB()
+
+        valid_columns = {
+            "price": "price",
+            "year": "production_year",
+            "cc": "cc"
+        }
+        if sort_by not in valid_columns:
+            print(f"Προσοχή: Μη έγκυρο κριτήριο ταξινόμησης '{sort_by}'.")
+            return None
+        
+        db_column = valid_columns[sort_by]
+        order = "DESC" if descending else "ASC"
+
+        query = f"SELECT * FROM cars ORDER BY {db_column} {order};"
+        db.execute(query)
+
+        cars = db.fetchall()
+        return cars
+    
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά την ταξινόμηση (GetSortedCars): {err}")
+        return None
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
