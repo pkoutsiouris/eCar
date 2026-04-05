@@ -272,8 +272,8 @@ class MainDashboard(QMainWindow):
         btn_filter.clicked.connect(self.open_filters)
         btn_filter.setStyleSheet("""
             QPushButton {
-                background-color: #2563eb; /* Βασικό μπλε χρώμα */
-                color: white;              /* Λευκά γράμματα */
+                background-color: #2563eb; 
+                color: white;         
                 border: none;
                 border-radius: 10px;
                 padding: 10px 16px;
@@ -282,17 +282,13 @@ class MainDashboard(QMainWindow):
             }
             
             QPushButton:hover {
-                /* Hover (η κατάσταση όταν απλά περνάς το ποντίκι από πάνω χωρίς να κάνεις κλικ) */
-                background-color: #1d4ed8; /* Γίνεται ένα "κλικ" πιο σκούρο μπλε */
             }
             
             QPushButton:pressed {
-                /* Pressed (η ακριβής στιγμή που κρατάς πατημένο το αριστερό κλικ) */
-                background-color: #1e3a8a; /* Γίνεται ακόμα πιο σκούρο */
-                padding-top: 12px;         /* Προσθέτει κενό από πάνω... */
-                padding-bottom: 8px;       /* ...και αφαιρεί από κάτω */
-                /* Αυτό το κόλπο με το padding κάνει το κείμενο να "πηδάει" 
-                   προς τα κάτω, δίνοντας την τέλεια ψευδαίσθηση φυσικού κουμπιού! */
+                background-color: #1e3a8a; 
+                padding-top: 12px;        
+                padding-bottom: 8px;       
+               
             }
         """)
 
