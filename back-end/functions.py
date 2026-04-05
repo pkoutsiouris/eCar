@@ -137,6 +137,50 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
 
 #TODO update/cars
 
+    
+#Εγγραφή χρήστη στο σύστημα
+#Instance method (μέθοδος του ίδιου του αντικειμένου)
+# Πρώτα δημιουργείται αντικείμενο User με τα στοιχεία που έδωσε ο πελάτης
+# και μετά του λέμε "αποθήκευσε τον εαυτό σου στη βάση"
+def RegisterUser(user: classes.User):
+    # Σύνδεση στη βάση
+    conn, db = ConnectDB()
+        
+    # Το SQL Query για την εισαγωγή
+        # Δεν βάζουμε το User_ID, γιατί είναι AUTO_INCREMENT (το βάζει η MySQL μόνη της)
+        # Ομοίως, η Registration_Date μπαίνει αυτόματα από τη βάση (CURRENT_TIMESTAMP)
+    query = "INSERT INTO Users(username, user_password, user_role, first_name, Surname, "\
+        "Email, Phone_Number, License_Number, License_Type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        
+        # Τα δεδομένα του χρήστη σε μορφή tuple
+    values = (
+        user.username,
+        user.password,
+        "Customer",
+        user.firstname, 
+        user.surname, 
+        user.email,
+        user.phone, 
+        user.license_no, 
+        user.license_type
+        )
+        
+    try:
+            # Εκτέλεση και αποθήκευση
+            db.execute(query, values)
+            conn.commit()
+            return True
+    except Exception as e:
+        # Αν σκάσει, πιθανότατα ο χρήστης έβαλε Email ή Δίπλωμα που υπάρχει ήδη (λόγω του UNIQUE constraint)
+        print(f"Σφάλμα κατά την εγγραφή: {e}")
+        print("Μήπως το Email ή ο Αριθμός Διπλώματος χρησιμοποιούνται ήδη;")
+        return False
+            
+    finally:
+        db.close()
+        conn.close()
+    
+
 def CheckUserExists(user: classes.User):
     try:
         conn,db = ConnectDB()
