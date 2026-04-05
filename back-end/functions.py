@@ -8,6 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
+            password="",
             password="8716",
             database="eCar_db"
         )
@@ -135,7 +136,7 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         conn.close()
     
 
-#TODO update/cars, register  
+#TODO update/cars
 
 def CheckUserExists(user: classes.User):
     try:

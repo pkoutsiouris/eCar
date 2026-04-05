@@ -1,9 +1,9 @@
 import functions
 
 class User:
-    def __init__(self,password: str, role: str, firstname: str ,
+    def __init__(self,uid: int, password: str, role: str, firstname: str ,
                   surname:str,email: str, phone: int, license_no: int, license_type: str):
-        #self.uid=uid
+        self.uid=uid
         self.password=password
         self.role=role
         self.firstname=firstname
@@ -12,6 +12,50 @@ class User:
         self.phone=phone
         self.license_no=license_no
         self.license_type=license_type
+        
+    #Εγγραφή χρήστη στο σύστημα
+    #Instance method (μέθοδος του ίδιου του αντικειμένου)
+    #Πρώτα δημιουργείται αντικείμενο User με τα στοιχεία που έδωσε ο πελάτης
+    # και μετά του λέμε "αποθήκευσε τον εαυτό σου στη βάση"
+    def RegisterUser(self):
+        # Σύνδεση στη βάση
+        conn, db = functions.ConnectDB()
+        
+        # Το SQL Query για την εισαγωγή
+        # Δεν βάζουμε το User_ID, γιατί είναι AUTO_INCREMENT (το βάζει η MySQL μόνη της)
+        # Ομοίως, η Registration_Date μπαίνει αυτόματα από τη βάση (CURRENT_TIMESTAMP)
+        query = "INSERT INTO Users(user_password, user_role, first_name, Surname, "\
+        "Email, Phone_Number, License_Number, License_Type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+        
+        # Τα δεδομένα του χρήστη σε μορφή tuple
+        values = (
+            self.role, 
+            self.firstname, 
+            self.surname, 
+            self.email, 
+            self.password,
+            self.phone, 
+            self.license_no, 
+            self.license_type
+        )
+        
+        try:
+            # Εκτέλεση και αποθήκευση
+            db.execute(query, values)
+            conn.commit()
+            
+            # Παίρνουμε το ID που μόλις δημιούργησε η MySQL και το δίνουμε στο αντικείμενο
+            self.uid = db.lastrowid
+            
+            print(f"Επιτυχία: Ο χρήστης {self.firstname} {self.surname} εγγράφηκε με νέο ID: {self.uid}!")
+        except Exception as e:
+            # Αν σκάσει, πιθανότατα ο χρήστης έβαλε Email ή Δίπλωμα που υπάρχει ήδη (λόγω του UNIQUE constraint)
+            print(f"Σφάλμα κατά την εγγραφή: {e}")
+            print("Μήπως το Email ή ο Αριθμός Διπλώματος χρησιμοποιούνται ήδη;")
+            
+        finally:
+            db.close()
+            conn.close()
     
 
 class Car: 
@@ -38,10 +82,10 @@ def main():
     print("Ξεκινάει η εφαρμογή...\n")
 
     # 2. Κλήση της μεθόδου που μιλάει με τη Βάση Δεδομένων (MySQL)
-    print("\nΓίνεται κλήση στη βάση δεδομένων...")
+    """ print("\nΓίνεται κλήση στη βάση δεδομένων...")
     try:
 
-        """TEST
+        TEST
         car = functions.GetCars()
 
         car = functions.GetCars()
@@ -72,10 +116,7 @@ def main():
             print("User exists")
         else:
             print("User does not exist")
-        TEST 
 
-            print("Car2 does not exist") 
- 
         
         print("Test 1: Get Users")
         all_users = functions.GetUsers()
@@ -100,12 +141,33 @@ def main():
 
         print("--- ΤΕΣΤ 4: GiveDealerAccess ---")
         functions.GiveDealerAccess(test_email)
+
+
+
+        # Δημιουργούμε το αντικείμενο στη μνήμη
+    new_customer = User(
+        uid=None,  # Δεν ξέρουμε ακόμα το ID
+        password="5n47/Rb", 
+        role="Customer", 
+        firstname="Κατερίνα", 
+        surname="Γεωργίου", 
+        email="kater@gmail.com", 
+        phone=6907339858, 
+        license_no=98765434, 
+        license_type="A"
+    )
+
+    # Καλούμε τη μέθοδο για να γράψουμε στη MySQL
+    print("Προσπάθεια εγγραφής νέου χρήστη...")
+    new_customer.RegisterUser()
             
 TEST"""  
         
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
-        print("(Σιγουρέψου ότι το MySQL server τρέχει και το αρχείο functions.py είναι σωστό!)")
+        print("(Σιγουρέψου ότι το MySQL server τρέχει και το αρχείο functions.py είναι σωστό!)") """
+"""
+    
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":
