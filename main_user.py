@@ -342,7 +342,7 @@ class MainDashboard(QMainWindow):
                 widget.deleteLater()
                 
         if not cars_list:   # Filtered list is empty (no cars match the criteria           
-                no_cars_label = QLabel("No cars matched these criterias.")
+                no_cars_label = QLabel("No cars matched these criteria.")
                 no_cars_label.setAlignment(Qt.AlignCenter)
                 no_cars_label.setStyleSheet("""
                     color: #8a94a6; 
