@@ -332,10 +332,6 @@ class MainDashboard(QMainWindow):
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: #f5f7fb;")
 
-       # grid = QGridLayout(scroll_content)
-       # grid.setContentsMargins(28, 24, 28, 28)
-       # grid.setHorizontalSpacing(22)
-       # grid.setVerticalSpacing(22)
 
         self.grid = QGridLayout(scroll_content)
         self.grid.setContentsMargins(28, 24, 28, 28)
@@ -430,9 +426,7 @@ class MainDashboard(QMainWindow):
     def create_car_card(self, car):
         card = QFrame()
         
-        # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 1/3 (Συνολικό Ύψος Κάρτας):
-        # Ήταν 305. Το κάναμε 360 για να δώσουμε χώρο στη νέα μεγαλύτερη φωτογραφία 
-        # και να μην πέφτουν τα γράμματα το ένα πάνω στο άλλο (overflow).
+        
         card.setMinimumHeight(360)
         card.setMaximumHeight(360)
         
@@ -506,9 +500,7 @@ class MainDashboard(QMainWindow):
 
         image_box = QFrame()
         
-        # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 2/3 (Ύψος Γκρι Κουτιού): 
-        # Ήταν 92, το κάναμε 140. Αφού μεγαλώσαμε την κάρτα στο προηγούμενο βήμα,
-        # τώρα δίνουμε αυτόν τον έξτρα χώρο στο γκρι κουτί για να γίνει "καμβάς" για τη φωτό.
+       
         image_box.setFixedHeight(140) 
         
         image_box.setStyleSheet("""
@@ -535,18 +527,14 @@ class MainDashboard(QMainWindow):
     
         if not pixmap.isNull():
             
-            # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 3/3 (Aspect Ratio & Cropping):
-            # Ήταν KeepAspectRatio (που προσπαθούσε να χωρέσει όλη την εικόνα μικραίνοντάς την).
-            # Το κάναμε KeepAspectRatioByExpanding (μεγαλώνει την εικόνα για να γεμίσει ΠΛΗΡΩΣ το νέο 140άρι κουτί, 
-            # διατηρώντας όμως τις σωστές αναλογίες του αμαξιού για να μη βγει παραμορφωμένο).
+            
             scaled_pixmap = pixmap.scaled(
                 340, 140, 
                 Qt.KeepAspectRatioByExpanding, 
                 Qt.SmoothTransformation
             )
             
-            # ...και εδώ βάζουμε το car_image να κόψει "με το μαχαίρι" (Crop) 
-            # ό,τι περισσεύει από τα δεξιά/αριστερά, για να μην πέσει η εικόνα πάνω στα κουμπιά.
+        
             car_image.setFixedSize(340, 140) 
             car_image.setPixmap(scaled_pixmap)
             
@@ -638,8 +626,7 @@ class MainDashboard(QMainWindow):
                 }
             """)
 
-        # ΓΙΑΤΙ ΤΟ ΠΡΟΣΘΕΣΑΜΕ: Φτιάχνουμε το ταμπελάκι της τιμής 
-        # Τραβάει το car["price"] και του κολλάει το € και το / day
+  
         price_label = QLabel(f"€{car['price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>/ day</span>")
         price_label.setStyleSheet("""
             color: #1d2736;
