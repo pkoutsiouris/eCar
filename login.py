@@ -200,7 +200,7 @@ class LoginWindow(QWidget):
             self.user_window.show()
             self.close()
         else:
-            QMessageBox.warning(self, "Login Failed", message)
+            QMessageBox.warning(self, "Login Failed!", message)
             
     def handle_register(self):
         from register import RegisterWindow
