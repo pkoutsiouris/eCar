@@ -1,5 +1,6 @@
 
 import mysql.connector
+import bcrypt
 import classes
 
 def ConnectDB():
@@ -161,11 +162,13 @@ def RegisterUser(user: classes.User):
             print("User already exists with email: " + user.email)  
             return False
         
+        hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
         query=" INSERT INTO users (username, user_password, " \
         "user_role, first_name, surname, email, phone_number, " \
         "license_number, license_type) VALUES (" \
         "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s,%s)"
-        db.execute(query,(user.username,user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
+        db.execute(query,(user.username,hashed_password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
                           user.license_type))
         conn.commit()
         return True
