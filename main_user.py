@@ -1,4 +1,6 @@
 import sys
+from back_end import functions as func
+
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup
@@ -12,14 +14,9 @@ class MainDashboard(QMainWindow):
         super().__init__()
         self.setWindowTitle("Car Rental - Dashboard")
         self.resize(1280, 820)
-        
-        # Τραβάμε τα αυτοκίνητα
-        db_cars = functions.GetCars()
 
-        if db_cars:
-            self.cars = db_cars
-        else:
-            self.cars = []
+        # ΜΟΝΟ 2 mock cars για preview
+        self.cars = func.GetCars()
 
         outer = QWidget()
         self.setCentralWidget(outer)
@@ -363,7 +360,7 @@ class MainDashboard(QMainWindow):
         name_wrap = QVBoxLayout()
         name_wrap.setSpacing(2)
 
-        title = QLabel(f"{car['brand']} {car['model']}")
+        title = QLabel(car["brand"])
         title.setStyleSheet("""
             color: #1d2736;
             font-size: 18px;
@@ -371,7 +368,7 @@ class MainDashboard(QMainWindow):
             border: none;
         """)
 
-        subtitle = QLabel(f'{car["cc"]} cc • {car["production_year"]}')
+        subtitle = QLabel(f'{car["production_year"]}')
         subtitle.setStyleSheet("""
             color: #6b7788;
             font-size: 12px;
@@ -466,7 +463,7 @@ class MainDashboard(QMainWindow):
         chips_row = QHBoxLayout()
         chips_row.setSpacing(8)
 
-        chips_row.addWidget(self.make_small_chip(f'{car["doors"]} Doors'))
+        #chips_row.addWidget(self.make_small_chip(f'{car["doors"]} Doors'))
         chips_row.addWidget(self.make_small_chip(f'{car["seats"]} Seats'))
         chips_row.addWidget(self.make_small_chip(car["transmission_type"]))
         chips_row.addWidget(self.make_small_chip(car["fuel_type"]))
@@ -475,13 +472,13 @@ class MainDashboard(QMainWindow):
         info_wrap = QVBoxLayout()
         info_wrap.setSpacing(4)
 
-        branch = QLabel("Athens Center")
-        branch.setStyleSheet("""
-            color: #263142;
-            font-size: 13px;
-            font-weight: 700;
-            border: none;
-        """)
+        #branch = QLabel(car["branch"])
+        #branch.setStyleSheet("""
+       #     color: #263142;
+       #     font-size: 13px;
+       #     font-weight: 700;
+       #     border: none;
+       # """)
 
         extra = QLabel("Vehicle details available")
         extra.setStyleSheet("""
@@ -490,7 +487,7 @@ class MainDashboard(QMainWindow):
             border: none;
         """)
 
-        info_wrap.addWidget(branch)
+        #info_wrap.addWidget(branch)
         info_wrap.addWidget(extra)
 
         bottom_row = QHBoxLayout()
