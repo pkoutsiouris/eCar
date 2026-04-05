@@ -10,7 +10,36 @@ from back_end import authentication as auth
 from main_user import MainDashboard
 
 
+class ResizableLogo(QLabel):
+    """A QLabel that automatically scales its pixmap to fit its size."""
+    def __init__(self, pixmap_path, parent=None):
+        super().__init__(parent)
+        self.orig_pixmap = QPixmap(pixmap_path)
+        self.setMinimumSize(1, 1) # Allow the layout to shrink it
+        self.setScaledContents(False) # We handle scaling manually for better quality
 
+    def paintEvent(self, event):
+        if not self.orig_pixmap.isNull():
+            # Calculate scaled size keeping aspect ratio
+            size = self.size()
+            scaled_pixmap = self.orig_pixmap.scaled(
+                size, 
+                Qt.KeepAspectRatio, 
+                Qt.SmoothTransformation
+            )
+            
+            # Center the image within the label
+            point = Qt.AlignCenter
+            # PySide6 specifics for alignment calculation
+            x = (size.width() - scaled_pixmap.width()) / 2
+            y = (size.height() - scaled_pixmap.height()) / 2
+            
+            from PySide6.QtGui import QPainter
+            painter = QPainter(self)
+            painter.drawPixmap(int(x), int(y), scaled_pixmap)
+            painter.end()
+        else:
+            super().paintEvent(event)
 class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -37,6 +66,9 @@ class LoginWindow(QWidget):
         outer_layout.setAlignment(Qt.AlignCenter)
         outer_layout.setSpacing(18)
         container.setLayout(outer_layout)
+
+        self.app_logo = ResizableLogo('assets/icon.png') 
+        self.app_logo.setFixedSize(120, 120)
 
         # LOGO TEXT
         logo_label = QLabel("eCar Rental")
@@ -167,7 +199,8 @@ class LoginWindow(QWidget):
         card_layout.addSpacing(8)
         card_layout.addWidget(login_button)
 
-        outer_layout.addWidget(logo_label)
+        outer_layout.addWidget(self.app_logo, alignment=Qt.AlignCenter)
+        outer_layout.addWidget(logo_label, alignment=Qt.AlignCenter)
         outer_layout.addWidget(card, alignment=Qt.AlignCenter)
         outer_layout.addWidget(register_button, alignment=Qt.AlignCenter)
 
