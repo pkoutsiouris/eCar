@@ -15,7 +15,7 @@ class User:
     
 
 class Car: 
-    def __init__(self,brand: str, model: str, prod_year: int, plate:str, seats: int, cc: int, state: str, desc: str,fuel: str, trans: str, 
+    def __init__(self,brand: str, model: str, prod_year: int, plate:str, seats: int,doors: int, cc: int, state: str, desc: str,fuel: str, trans: str, 
                  horsepower: int, imgPath: str, price: float, availability: bool):
         self.brand=brand
         self.model=model
@@ -31,6 +31,7 @@ class Car:
         self.imgPath=imgPath
         self.availability=availability
         self.price=price
+        self.doors=doors
     
 
         
