@@ -92,38 +92,35 @@ def GetUsers():
 def FilterCars(price: float, year: int, cc: int , horses: int):
     try:
         conn,db=ConnectDB()
-        prflag=False
-        yrflag=False
-        ccflag=False
-        horseflag=False
+
         query="select * from cars"
+
+        conditions = []
+        values = []
+
+        # Μαζεύουμε όσα φίλτρα έδωσε ο χρήστης
         if price is not None:
-            query=query+ " where "
-            prflag=True
-            query=query+" price='"+str(price)+"'"
-
+            conditions.append("price = %s")
+            values.append(price)
         if year is not None:
-            if prflag:
-                query=query+" and production_year='"+str(year)+"'"
-            else:
-                query=query+"production_year='"+str(year)+"'"
-            yrflag=True
-
+            conditions.append("production_year = %s")
+            values.append(year)
         if cc is not None:
-            if prflag or yrflag:
-                query=query + " and cc='"+str(cc)+"'"
-            else:
-                query=query + " cc='"+str(cc)+"'"
-            ccflag=True
+            conditions.append("cc = %s")
+            values.append(cc)
         if horses is not None:
-            if prflag or yrflag or ccflag:
-                query=query+" and horsepower='"+str(horses)+"'"
-            else:
-                query=query+" horsepower='"+str(horses)+"'"
-            horseflag=True
+            conditions.append("horsepower = %s")
+            values.append(horses)
+
+        # Αν υπάρχει έστω και ένα φίλτρο, τα ενώνουμε αυτόματα με " AND "
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
             
-        query=query+";"
-        db.execute(query)
+        query += ";"
+        
+        # Η execute αναλαμβάνει να βάλει τις τιμές με ασφάλεια στη θέση των %s
+        db.execute(query, tuple(values))
+        cars = db.fetchall()
         cars = db.fetchall()
         return cars
 
@@ -131,8 +128,10 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
         return False
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
     
 
 #TODO update/cars
@@ -250,11 +249,11 @@ def DeleteCar(car: classes.Car):
     try:
         conn,db = ConnectDB() 
 
-        if CheckCarExists(car):
+        if not CheckCarExists(car):
             print("Car doesn't exists")  
             return False
            
-        query = "delete from cars where licence_plate=%s"
+        query = "DELETE FROM cars WHERE licence_plate=%s"
         db.execute(query,(car.car_id))
         conn.commit()
 
@@ -265,8 +264,10 @@ def DeleteCar(car: classes.Car):
         print("Σφάλμα κατά τη διαγραφή: {err}")   
         return False
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GetSortedCars(sort_by: str, descending: bool = False):
     try:
