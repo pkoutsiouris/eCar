@@ -253,7 +253,7 @@ def DeleteCar(car: classes.Car):
             print("Car doesn't exists")  
             return False
            
-        query = "DELETE FROM cars WHERE licence_plate=%s"
+        query = "DELETE FROM cars WHERE license_plate=%s"
         db.execute(query,(car.car_id))
         conn.commit()
 
