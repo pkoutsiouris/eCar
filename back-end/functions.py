@@ -121,7 +121,6 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         # Η execute αναλαμβάνει να βάλει τις τιμές με ασφάλεια στη θέση των %s
         db.execute(query, tuple(values))
         cars = db.fetchall()
-        cars = db.fetchall()
         return cars
 
     except mysql.connector.Error as err:
@@ -254,14 +253,16 @@ def DeleteCar(car: classes.Car):
             return False
            
         query = "DELETE FROM cars WHERE license_plate=%s"
-        db.execute(query,(car.car_id))
+        # ΔΙΟΡΘΩΣΗ 1 & 2: Μπήκε το car.plate και το κόμμα (,)
+        db.execute(query, (car.plate,))
         conn.commit()
 
         print(f"Επιτυχία: Το αυτοκίνητο {car.plate} διαγράφηκε.")
         return True
 
     except Exception as err:
-        print("Σφάλμα κατά τη διαγραφή: {err}")   
+        # ΔΙΟΡΘΩΣΗ 3: Μπήκε το f-string
+        print(f"Σφάλμα κατά τη διαγραφή: {err}")   
         return False
     finally:
         if 'db' in locals() and db is not None:
