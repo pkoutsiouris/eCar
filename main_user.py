@@ -272,8 +272,8 @@ class MainDashboard(QMainWindow):
         btn_filter.clicked.connect(self.open_filters)
         btn_filter.setStyleSheet("""
             QPushButton {
-                background-color: #2563eb; /* Βασικό μπλε χρώμα */
-                color: white;              /* Λευκά γράμματα */
+                background-color: #2563eb; 
+                color: white;              
                 border: none;
                 border-radius: 10px;
                 padding: 10px 16px;
@@ -282,17 +282,15 @@ class MainDashboard(QMainWindow):
             }
             
             QPushButton:hover {
-                /* Hover (η κατάσταση όταν απλά περνάς το ποντίκι από πάνω χωρίς να κάνεις κλικ) */
-                background-color: #1d4ed8; /* Γίνεται ένα "κλικ" πιο σκούρο μπλε */
+                /* Hover */
+                background-color: #1d4ed8; 
             }
             
             QPushButton:pressed {
-                /* Pressed (η ακριβής στιγμή που κρατάς πατημένο το αριστερό κλικ) */
-                background-color: #1e3a8a; /* Γίνεται ακόμα πιο σκούρο */
-                padding-top: 12px;         /* Προσθέτει κενό από πάνω... */
-                padding-bottom: 8px;       /* ...και αφαιρεί από κάτω */
-                /* Αυτό το κόλπο με το padding κάνει το κείμενο να "πηδάει" 
-                   προς τα κάτω, δίνοντας την τέλεια ψευδαίσθηση φυσικού κουμπιού! */
+                /* Pressed */
+                background-color: #1e3a8a; 
+                padding-top: 12px;        
+                padding-bottom: 8px;      
             }
         """)
 
@@ -341,8 +339,6 @@ class MainDashboard(QMainWindow):
         self.grid.setContentsMargins(28, 24, 28, 28)
         self.grid.setHorizontalSpacing(22)
         self.grid.setVerticalSpacing(22)
-
-        # Αντί για τη λούπα, καλούμε τη νέα συνάρτηση
         self.update_grid(self.cars)
 
         scroll.setWidget(scroll_content)
@@ -354,13 +350,11 @@ class MainDashboard(QMainWindow):
         content_layout.addWidget(scroll)
 
     def update_grid(self, cars_list):
-        # 1. Καθαρίζουμε την οθόνη από τα παλιά αμάξια
         for i in reversed(range(self.grid.count())):
             widget = self.grid.itemAt(i).widget()
             if widget:
                 widget.deleteLater()
                 
-        # 2. Ζωγραφίζουμε τα νέα
         row = 0
         col = 0
         for car in cars_list:
@@ -375,16 +369,14 @@ class MainDashboard(QMainWindow):
         dialog = FilterDialog(self)
         if dialog.exec():
             try:
-                # Παίρνουμε τα 4 νούμερα από το Popup
                 price, year, cc, hp = dialog.get_values()
                 
-                # Αν είναι όλα άδεια, φέρε πάλι όλα τα αμάξια
                 if all(v is None for v in [price, year, cc, hp]):
                     filtered = functions.GetCars()
                 else:
                     filtered = functions.FilterCars(price, year, cc, hp)
                 
-                print("Φιλτραρισμένα αυτοκίνητα:", filtered)  # Debug print για να δούμε τι επιστρέφει η βάση
+                print("Φιλτραρισμένα αυτοκίνητα:", filtered) 
                 self.update_grid(filtered)
             except ValueError:
                 print("Σφάλμα: Παρακαλώ εισάγετε μόνο νούμερα στα φίλτρα.")
@@ -424,10 +416,6 @@ class MainDashboard(QMainWindow):
 
     def create_car_card(self, car):
         card = QFrame()
-        
-        # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 1/3 (Συνολικό Ύψος Κάρτας):
-        # Ήταν 305. Το κάναμε 360 για να δώσουμε χώρο στη νέα μεγαλύτερη φωτογραφία 
-        # και να μην πέφτουν τα γράμματα το ένα πάνω στο άλλο (overflow).
         card.setMinimumHeight(360)
         card.setMaximumHeight(360)
         
@@ -500,10 +488,6 @@ class MainDashboard(QMainWindow):
         top_row.addWidget(status_badge)
 
         image_box = QFrame()
-        
-        # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 2/3 (Ύψος Γκρι Κουτιού): 
-        # Ήταν 92, το κάναμε 140. Αφού μεγαλώσαμε την κάρτα στο προηγούμενο βήμα,
-        # τώρα δίνουμε αυτόν τον έξτρα χώρο στο γκρι κουτί για να γίνει "καμβάς" για τη φωτό.
         image_box.setFixedHeight(140) 
         
         image_box.setStyleSheet("""
@@ -529,19 +513,12 @@ class MainDashboard(QMainWindow):
         pixmap = QPixmap(img_path)
     
         if not pixmap.isNull():
-            
-            # ΓΙΑΤΙ ΤΟ ΑΛΛΑΞΑΜΕ 3/3 (Aspect Ratio & Cropping):
-            # Ήταν KeepAspectRatio (που προσπαθούσε να χωρέσει όλη την εικόνα μικραίνοντάς την).
-            # Το κάναμε KeepAspectRatioByExpanding (μεγαλώνει την εικόνα για να γεμίσει ΠΛΗΡΩΣ το νέο 140άρι κουτί, 
-            # διατηρώντας όμως τις σωστές αναλογίες του αμαξιού για να μη βγει παραμορφωμένο).
             scaled_pixmap = pixmap.scaled(
                 340, 140, 
                 Qt.KeepAspectRatioByExpanding, 
                 Qt.SmoothTransformation
             )
             
-            # ...και εδώ βάζουμε το car_image να κόψει "με το μαχαίρι" (Crop) 
-            # ό,τι περισσεύει από τα δεξιά/αριστερά, για να μην πέσει η εικόνα πάνω στα κουμπιά.
             car_image.setFixedSize(340, 140) 
             car_image.setPixmap(scaled_pixmap)
             
@@ -582,7 +559,7 @@ class MainDashboard(QMainWindow):
         info_wrap.addWidget(extra)
 
         bottom_row = QHBoxLayout()
-        bottom_row.setSpacing(15) # Βάλαμε λίγο παραπάνω κενό
+        bottom_row.setSpacing(15) 
 
         btn_details = QPushButton("Details")
         btn_details.setCursor(Qt.PointingHandCursor)
@@ -633,8 +610,6 @@ class MainDashboard(QMainWindow):
                 }
             """)
 
-        # ΓΙΑΤΙ ΤΟ ΠΡΟΣΘΕΣΑΜΕ: Φτιάχνουμε το ταμπελάκι της τιμής 
-        # Τραβάει το car["price"] και του κολλάει το € και το / day
         price_label = QLabel(f"€{car['price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>/ day</span>")
         price_label.setStyleSheet("""
             color: #1d2736;
@@ -645,8 +620,6 @@ class MainDashboard(QMainWindow):
 
         bottom_row.addWidget(btn_details)
         bottom_row.addStretch()
-        
-        # ΠΡΟΣΘΗΚΗ: Βάζουμε την τιμή δίπλα στο κουμπί Select!
         bottom_row.addWidget(price_label) 
         bottom_row.addWidget(btn_select)
 
