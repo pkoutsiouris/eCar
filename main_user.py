@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from back_end import functions
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QIcon
 
 class FilterDialog(QDialog):
     def __init__(self, parent=None): 
@@ -46,6 +46,7 @@ class MainDashboard(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Car Rental - Dashboard")
+        self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
         
         # Τραβάμε τα αυτοκίνητα
@@ -132,7 +133,7 @@ class MainDashboard(QMainWindow):
         logo_layout.setContentsMargins(18, 0, 18, 10)
         logo_layout.setSpacing(2)
 
-        logo = QLabel("CarRental")
+        logo = QLabel("eCar Rental")
         logo.setStyleSheet("""
             color: white;
             font-size: 24px;

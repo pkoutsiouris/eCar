@@ -10,8 +10,16 @@ from login import LoginWindow
 
 class RegisterWindow(QWidget):
     def __init__(self):
+        header_style = """
+            color: #64748b; 
+            font-size: 16px; 
+            font-weight: bold; 
+            background: transparent;
+            text-transform: uppercase;
+        """
         super().__init__()
         self.setWindowTitle("Car Rental - Register")
+        self.setWindowIcon(QIcon('assets/icon.png'))
 
         # 1. ΦΟΝΤΟ (BACKGROUND)
         self.bg_label = QLabel(self)
@@ -33,7 +41,7 @@ class RegisterWindow(QWidget):
         container.setLayout(outer_layout)
 
         # LOGO
-        logo_label = QLabel("CAR RENTAL")
+        logo_label = QLabel("eCar Rental")
         logo_label.setAlignment(Qt.AlignCenter)
         logo_label.setStyleSheet("color: white; font-size: 34px; font-weight: bold; letter-spacing: 2px; background: transparent;")
 
@@ -50,7 +58,7 @@ class RegisterWindow(QWidget):
 
         card_layout = QVBoxLayout()
         card_layout.setContentsMargins(35, 30, 35, 30)
-        card_layout.setSpacing(12) 
+        card_layout.setSpacing(5) 
         card.setLayout(card_layout)
 
         title = QLabel("CREATE ACCOUNT")
@@ -152,18 +160,39 @@ class RegisterWindow(QWidget):
         self.back_to_login.setStyleSheet("color: white; border: none; background: transparent; text-decoration: underline;")
         self.back_to_login.clicked.connect(self.go_to_login)
 
-        # ΠΡΟΣΘΗΚΗ ΣΤΑ LAYOUTS
         card_layout.addWidget(title)
-        card_layout.addWidget(self.username_input)
+        card_layout.addSpacing(10)
+
+        personal_header = QLabel("Personal Details")
+        personal_header.setStyleSheet(header_style)
+        card_layout.addWidget(personal_header)
+        
         card_layout.addWidget(self.firstName_input)
         card_layout.addWidget(self.surname_input)
+
+        contact_header = QLabel("Contact Details")
+        contact_header.setStyleSheet(header_style)
+        card_layout.addWidget(contact_header)
+
         card_layout.addWidget(self.email_input)
         card_layout.addWidget(self.phoneNumber_input)
+
+        license_header = QLabel("Driving License Details")
+        license_header.setStyleSheet(header_style)
+        card_layout.addWidget(license_header)
+        
         card_layout.addWidget(self.licenseNumber_input)
         card_layout.addWidget(self.licenseType_input)
+
+        credentials_header = QLabel("Account Credentials")
+        credentials_header.setStyleSheet(header_style)
+        card_layout.addWidget(credentials_header)
+        
+        card_layout.addWidget(self.username_input)
         card_layout.addWidget(self.password_input)
         card_layout.addWidget(self.confirm_password_input)
 
+        card_layout.addSpacing(15)
         card_layout.addWidget(self.register_button)
         
 

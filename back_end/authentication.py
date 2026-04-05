@@ -17,9 +17,6 @@ def get_user_by_email(email):
             database="eCar_db"
         )
         cursor = conn.cursor(dictionary=True)
-        
-        # Υποθέτουμε ότι ο πίνακας σας λέγεται 'users' 
-        # και έχει στήλες: id, email, password, role
         query = "SELECT user_id, email, user_password, user_role FROM users WHERE email = %s"
         cursor.execute(query, (email,))
         
@@ -37,7 +34,7 @@ def get_user_by_email(email):
 def is_valid_email(email):
     """Ελέγχει αν το email έχει σωστή μορφή (Business Logic)."""
     email = email.strip().lower()
-    allowed_domains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@outlook.com"]
+    allowed_domains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@outlook.com", "@hotmail.com"]
     
     if "@" not in email or email.startswith("@"):
         return False
@@ -49,7 +46,6 @@ def is_valid_email(email):
 
 def authenticate_user(email, password):
     """
-    Αυτή είναι η συνάρτηση που θα καλέσει ο φίλος σου από το PySide6!
     Επιστρέφει 3 πράγματα: (Επιτυχία/Αποτυχία, Μήνυμα, Ρόλος)
     """
     email = email.strip()
@@ -57,21 +53,20 @@ def authenticate_user(email, password):
 
     # 1. Έλεγχος αν είναι κενά
     if not email or not password:
-        return False, "Συμπλήρωσε και email και password.", None
+        return False, "Fill in both your email and password.", None
 
     # 2. Έλεγχος μορφής email
     if not is_valid_email(email):
-        return False, "Βάλε ένα σωστό email (π.χ. @gmail.com).", None
+        return False, "Email not valid!(try ex. @gmail.com).", None
 
     # 3. Ψάχνουμε τον χρήστη στη βάση μέσω του Model
     user = get_user_by_email(email) 
 
     if user is None:
-        return False, "Ο χρήστης με αυτό το email δεν βρέθηκε.", None
+        return False, "The user with this email address was not found.", None
 
     # 4. Ελέγχουμε τον κωδικό
     if user['user_password'] == password:
-        # Όλα πήγαν καλά! Στέλνουμε πίσω True, ένα μήνυμα, και τον ρόλο του.
-        return True, "Επιτυχής σύνδεση", user['user_role']
+        return True, "Connection Successful!", user['user_role']
     else:
-        return False, "Λάθος κωδικός πρόσβασης.", None
+        return False, "Wrong Password.", None

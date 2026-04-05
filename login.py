@@ -15,7 +15,7 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Car Rental Login")
-        
+        self.setWindowIcon(QIcon('assets/icon.png'))
         
 
         self.bg_label = QLabel(self)
@@ -39,7 +39,7 @@ class LoginWindow(QWidget):
         container.setLayout(outer_layout)
 
         # LOGO TEXT
-        logo_label = QLabel("eCar")
+        logo_label = QLabel("eCar Rental")
         logo_label.setAlignment(Qt.AlignCenter)
         logo_label.setStyleSheet("""
             color: white;
