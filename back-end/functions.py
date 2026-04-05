@@ -263,7 +263,6 @@ def DeleteCar(car: classes.Car):
         db.close()
         conn.close()
 
-
 def GetSortedCars(sort_by: str, descending: bool = False):
     try:
         conn, db = ConnectDB()
