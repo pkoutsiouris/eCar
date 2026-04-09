@@ -1,3 +1,5 @@
+import mysql.connector
+import bcrypt
 import classes
 import functions
 
@@ -68,11 +70,15 @@ def authenticate_user(email, password):
         return False, "Ο χρήστης με αυτό το email δεν βρέθηκε.", None
 
     # 4. Ελέγχουμε τον κωδικό
-    if user['user_password'] == password:
-        # Όλα πήγαν καλά! Στέλνουμε πίσω True, ένα μήνυμα, και τον ρόλο του.
-        return True, "Επιτυχής σύνδεση", user['user_role']
-    else:
-        return False, "Λάθος κωδικός πρόσβασης.", None
+    try:
+        # Το bcrypt συγκρίνει τον κωδικό που έγραψε ο χρήστης με το hash της βάσης
+        if bcrypt.checkpw(password.encode('utf-8'), user['user_password'].encode('utf-8')):
+            return True, "Επιτυχής σύνδεση", user['user_role']
+        else:
+            return False, "Λάθος κωδικός πρόσβασης.", None
+    except ValueError:
+        # Αυτό το βάζουμε για ασφάλεια, αν πάει να ελέγξει παλιούς μη-κρυπτογραφημένους κωδικούς
+        return False, "Σφάλμα: Ο κωδικός στη βάση δεν είναι σωστά κρυπτογραφημένος.", None
     
 #test_main
 if __name__=="__main__":

@@ -1,5 +1,6 @@
 
 import mysql.connector
+import bcrypt
 import classes
 
 def ConnectDB():
@@ -121,7 +122,6 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         # Η execute αναλαμβάνει να βάλει τις τιμές με ασφάλεια στη θέση των %s
         db.execute(query, tuple(values))
         cars = db.fetchall()
-        cars = db.fetchall()
         return cars
 
     except mysql.connector.Error as err:
@@ -172,8 +172,10 @@ def CheckUserExists(user: classes.User):
         print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def RegisterUser(user: classes.User):
     try:
@@ -182,11 +184,13 @@ def RegisterUser(user: classes.User):
             print("User already exists with email: " + user.email)  
             return False
         
+        hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
         query=" INSERT INTO users (username, user_password, " \
         "user_role, first_name, surname, email, phone_number, " \
         "license_number, license_type) VALUES (" \
         "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s,%s)"
-        db.execute(query,(user.username,user.password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
+        db.execute(query,(user.username,hashed_password,user.role,user.firstname,user.surname,user.email,user.phone,user.license_no,
                           user.license_type))
         conn.commit()
         return True
@@ -194,8 +198,10 @@ def RegisterUser(user: classes.User):
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
         return False
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GiveDealerAccess(email: str):
     try:
@@ -276,14 +282,16 @@ def DeleteCar(car: classes.Car):
             return False
            
         query = "DELETE FROM cars WHERE license_plate=%s"
-        db.execute(query,(car.car_id))
+        # ΔΙΟΡΘΩΣΗ 1 & 2: Μπήκε το car.plate και το κόμμα (,)
+        db.execute(query, (car.plate,))
         conn.commit()
 
         print(f"Επιτυχία: Το αυτοκίνητο {car.plate} διαγράφηκε.")
         return True
 
     except Exception as err:
-        print("Σφάλμα κατά τη διαγραφή: {err}")   
+        # ΔΙΟΡΘΩΣΗ 3: Μπήκε το f-string
+        print(f"Σφάλμα κατά τη διαγραφή: {err}")   
         return False
     finally:
         if 'db' in locals() and db is not None:
