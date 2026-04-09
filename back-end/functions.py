@@ -8,7 +8,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="root",
+            password="",
             database="eCar_db"
         )
         
@@ -133,8 +133,30 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         if 'conn' in locals() and conn is not None:
             conn.close()
     
-
 #TODO update/cars
+def UpdateCars(updcar: classes.Car):
+    try:
+        conn,db = ConnectDB() 
+        if CheckCarExists(car):
+            print("Car already exists with license plate: " + car.plate)  
+            return False
+            
+           
+        query=" INSERT INTO cars (brand, model, " \
+        "production_year, license_plate, seats, cc, state, " \
+        "car_description, fuel_type, transmission_type, horsepower, " \
+        "image_path, price, availability) VALUES (" \
+        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
+        db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
+                          car.desc,car.fuel,car.trans,car.horsepower,car.imgPath,car.price,car.availability))
+        conn.commit()
+        return True
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+        return False
+    finally:
+        db.close()
+        conn.close()
 
 def CheckUserExists(user: classes.User):
     try:
