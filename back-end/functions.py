@@ -134,26 +134,28 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
             conn.close()
     
 #TODO update/cars
-def UpdateCars(updcar: classes.Car):
+def ChangeCarDescr(car : classes.Car, new_desc: str):
     try:
-        conn,db = ConnectDB() 
-        if CheckCarExists(car):
-            print("Car already exists with license plate: " + car.plate)  
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckCarExists(car):
+            print("Car doesn't exist")  
             return False
             
-           
-        query=" INSERT INTO cars (brand, model, " \
-        "production_year, license_plate, seats, cc, state, " \
-        "car_description, fuel_type, transmission_type, horsepower, " \
-        "image_path, price, availability) VALUES (" \
-        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
-        db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
-                          car.desc,car.fuel,car.trans,car.horsepower,car.imgPath,car.price,car.availability))
+        query="update cars set car_description=%s where license_plate=%s"
+        db.execute(query,(new_desc, car.plate))
         conn.commit()
+        print("Επιτυχία")
         return True
-    except mysql.connector.Error as err:
-        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
         return False
+    
     finally:
         db.close()
         conn.close()

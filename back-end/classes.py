@@ -37,10 +37,9 @@ def main():
     print("Ξεκινάει η εφαρμογή...\n")
 
     # 2. Κλήση της μεθόδου που μιλάει με τη Βάση Δεδομένων (MySQL)
-    """ print("\nΓίνεται κλήση στη βάση δεδομένων...")
-    try:
+    print("\nΓίνεται κλήση στη βάση δεδομένων...")
+    """try:
 
-        TEST
         car = functions.GetCars()
 
         car = functions.GetCars()
@@ -50,7 +49,7 @@ def main():
         )
         response = functions.CreateCar(car2)
         print("Response of getcars ",response)
-
+    
         res = functions.CheckCarExists(car2)
         if res:
             print("Car2 exists")
@@ -98,9 +97,7 @@ def main():
         functions.GiveDealerAccess(test_email)
 
 
-            
-    TEST"""  
-        
+# Δοκιμή Δημιουργίας χρήστη
     try:
         # Δημιουργούμε το αντικείμενο στη μνήμη
         new_customer = User(
@@ -120,7 +117,18 @@ def main():
         functions.  RegisterUser(new_customer)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
+    """
+# Test: Edit car description
+    try:
+        new_car = Car("Toyota","C-HR",2021,"XAL1523",5,1800,"Available",
+        "Σε άριστη κατάσταση","Hybrid","Auto",122,"/imgs/chr.png",229.0,True
+        )
+        functions.CreateCar(new_car)
 
+        print("Προσπάθεια επεξεργασίας περιγραφής αυτοκινήτου:")
+        functions.ChangeCarDescr(new_car, "Δεκτός κάθε έλεγχος")
+    except Exception as e:
+        print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
     
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
