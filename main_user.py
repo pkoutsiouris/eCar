@@ -706,8 +706,7 @@ class MainDashboard(QMainWindow):
 
 if __name__ == "__main__":
     
-    functions.CreateReservation(MainDashboard.session_email)
     app = QApplication(sys.argv)
-    window = MainDashboard()
+    window = MainDashboard(None)
     window.show()
     sys.exit(app.exec())
