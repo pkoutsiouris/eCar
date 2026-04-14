@@ -117,7 +117,7 @@ def main():
         functions.  RegisterUser(new_customer)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
-    """
+
 # Test: Edit car description
     try:
         new_car = Car("Toyota","C-HR",2021,"XAL1523",5,1800,"Available",
@@ -127,6 +127,19 @@ def main():
 
         print("Προσπάθεια επεξεργασίας περιγραφής αυτοκινήτου:")
         functions.ChangeCarDescr(new_car, "Δεκτός κάθε έλεγχος")
+    except Exception as e:
+        print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
+        """
+
+# Test: Edit car price
+    try:
+        new_car = Car("Toyota","C-HR",2021,"XAL1523",5,1800,"Available",
+        "Σε άριστη κατάσταση","Hybrid","Auto",122,"/imgs/chr.png",229.0,True
+        )
+        functions.CreateCar(new_car)
+
+        print("Προσπάθεια αλλαγής τιμής αυτοκινήτου:")
+        functions.ChangeCarPrice(new_car, 222.0)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
     
