@@ -42,7 +42,7 @@ def GetCars():
         conn,db = ConnectDB()
         query = "select * from cars;"
         db.execute(query)
-        print("afer db execute\n")
+        print("after db execute\n")
         car = db.fetchall()
         return car
     except mysql.connector.Error as err:
@@ -313,7 +313,7 @@ def GetCarByLicense(license:str):
         conn,db = ConnectDB()
         query = "select * from cars where license_plate=%s"
         db.execute(query,(license, ))
-        print("afer db execute\n")
+        print("after db execute\n")
         car = db.fetchone()
         return car
     except mysql.connector.Error as err:
@@ -373,7 +373,7 @@ def GetUserReservations(email:str):
         user = GetUserSession(email)
         query = "select * from reservations where user_id=%s"
         db.execute(query,(user["user_id"], ))
-        print("afer db execute\n")
+        print("after db execute\n")
         reservation = db.fetchone()
         return reservation
     except mysql.connector.Error as err:

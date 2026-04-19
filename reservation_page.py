@@ -1,13 +1,48 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QDateTimeEdit, QDialogButtonBox
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QDateTime 
 from back_end import functions
 from PySide6.QtGui import QPixmap, QIcon
 
+class DatePickerDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Select Reservation Dates")
+        self.setFixedWidth(350)
+        
+        layout = QVBoxLayout(self)
+        form = QFormLayout()
 
+        # Ορισμός τρέχουσας ημερομηνίας ως default
+        now = QDateTime.currentDateTime()
+
+        self.start_date_edit = QDateTimeEdit(now)
+        self.start_date_edit.setCalendarPopup(True)
+        self.start_date_edit.setDisplayFormat("yyyy-MM-dd HH:mm")
+
+        self.end_date_edit = QDateTimeEdit(now.addDays(1))
+        self.end_date_edit.setCalendarPopup(True)
+        self.end_date_edit.setDisplayFormat("yyyy-MM-dd HH:mm")
+
+        form.addRow("Start Date:", self.start_date_edit)
+        form.addRow("End Date:", self.end_date_edit)
+        
+        layout.addLayout(form)
+
+        # Buttons (OK / Cancel)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def get_dates(self):
+        # Επιστρέφει τις ημερομηνίες στο string format που ζήτησες
+        start_str = self.start_date_edit.dateTime().toString("yyyy-MM-dd HH:mm")
+        end_str = self.end_date_edit.dateTime().toString("yyyy-MM-dd HH:mm")
+        return start_str, end_str
 class ReservationsWindow(QMainWindow):
     def __init__(self,session_email:str):
         super().__init__()
@@ -286,6 +321,40 @@ class ReservationsWindow(QMainWindow):
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background-color: #f5f7fb;")
 
+        # ... (υπάρχων κώδικας toolbar) ...
+        toolbar_layout.setContentsMargins(28, 0, 28, 0)
+        toolbar_layout.setSpacing(12)
+
+        # ΝΕΟ ΚΟΥΜΠΙ ΕΠΙΛΟΓΗΣ ΗΜΕΡΟΜΗΝΙΑΣ
+        self.btn_pick_dates = QPushButton("📅 Set Dates")
+        self.btn_pick_dates.setCursor(Qt.PointingHandCursor)
+        self.btn_pick_dates.clicked.connect(self.open_date_picker)
+        self.btn_pick_dates.setStyleSheet("""
+            QPushButton {
+                background-color: #3a5a54;
+                color: white;
+                border-radius: 8px;
+                padding: 8px 16px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #4a6d64;
+            }
+        """)
+        toolbar_layout.addWidget(self.btn_pick_dates) # Προσθήκη στο toolbardef open_date_picker(self):
+        dialog = DatePickerDialog(self)
+        if dialog.exec() == QDialog.Accepted:
+            start_date, end_date = dialog.get_dates()
+            
+            # Εδώ έχεις τις ημερομηνίες έτοιμες για το st = datetime.strptime(...)
+            print(f"Selected Start: {start_date}")
+            print(f"Selected End: {end_date}")
+            
+            # Μπορείς να ενημερώσεις το UI ή να φιλτράρεις τα αυτοκίνητα
+            self.btn_pick_dates.setText(f"📅 {start_date} to {end_date}")
+        
+        toolbar_layout.addStretch()
+        # ...
 
         self.grid = QGridLayout(scroll_content)
         self.grid.setContentsMargins(28, 24, 28, 28)
@@ -300,7 +369,14 @@ class ReservationsWindow(QMainWindow):
 
         scroll.setWidget(scroll_content)
         content_layout.addWidget(scroll)
-
+    def open_date_picker(self):
+        """Αυτή η μέθοδος έλειπε ή ήταν σε λάθος θέση!"""
+        dialog = DatePickerDialog(self)
+        if dialog.exec() == QDialog.Accepted:
+            start_date, end_date = dialog.get_dates()
+            # Εδώ οι ημερομηνίες είναι ακριβώς στο format που θες
+            print(f"Start: {start_date}, End: {end_date}")
+            self.btn_pick_dates.setText(f"📅 {start_date}")
     def update_grid(self, cars_list):
         for i in reversed(range(self.grid.count())):
             widget = self.grid.itemAt(i).widget()
@@ -469,7 +545,17 @@ class ReservationsWindow(QMainWindow):
                 border-radius: 12px;
             }
         """)
-
+        def open_date_picker(self):
+            dialog = DatePickerDialog(self)
+            if dialog.exec() == QDialog.Accepted:
+                start_date, end_date = dialog.get_dates()
+                
+                # Εδώ έχεις τις ημερομηνίες έτοιμες για το st = datetime.strptime(...)
+                print(f"Selected Start: {start_date}")
+                print(f"Selected End: {end_date}")
+                
+                # Μπορείς να ενημερώσεις το UI ή να φιλτράρεις τα αυτοκίνητα
+                self.btn_pick_dates.setText(f"📅 {start_date} to {end_date}")
         image_layout = QVBoxLayout(image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
         
@@ -602,6 +688,6 @@ class ReservationsWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ReservationsWindow()
+    window = ReservationsWindow(None)
     window.show()
     sys.exit(app.exec())
