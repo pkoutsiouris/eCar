@@ -132,8 +132,7 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
-    
-#TODO update/cars
+
 def ChangeCarDescr(car : classes.Car, new_desc: str):
     try:
         conn,db = ConnectDB()
@@ -148,6 +147,32 @@ def ChangeCarDescr(car : classes.Car, new_desc: str):
             
         query="update cars set car_description=%s where license_plate=%s"
         db.execute(query,(new_desc, car.plate))
+        conn.commit()
+        print("Επιτυχία")
+        return True
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
+        return False
+    
+    finally:
+        db.close()
+        conn.close()
+
+def ChangeCarPrice(car : classes.Car, new_price: float):
+    try:
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckCarExists(car):
+            print("Car doesn't exist")  
+            return False
+            
+        query="update cars set price=%s where license_plate=%s"
+        db.execute(query,(new_price, car.plate))
         conn.commit()
         print("Επιτυχία")
         return True
