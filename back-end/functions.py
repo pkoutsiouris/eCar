@@ -457,8 +457,10 @@ def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
         total_price = 100
         reservation_status=True
 
-        query=query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
+        query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
+        query2 = "update cars set='In_service' where car_id=%s"
+        db.execute(query2, [car_id])
         conn.commit()
 
         print("Reservation completed!")
