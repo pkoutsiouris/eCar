@@ -129,7 +129,7 @@ def main():
         functions.ChangeCarDescr(new_car, "Δεκτός κάθε έλεγχος")
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
-        """
+        
 
 # Test: Edit car price
     try:
@@ -140,6 +140,19 @@ def main():
 
         print("Προσπάθεια αλλαγής τιμής αυτοκινήτου:")
         functions.ChangeCarPrice(new_car, 222.0)
+    except Exception as e:
+        print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
+        """
+
+# Test: Edit car state
+    try:
+        new_car = Car("Toyota","C-HR",2021,"XAL1523",4,1800,"Available",
+        "Σε άριστη κατάσταση","Hybrid","Auto",122,"/imgs/chr.png",229.0,True
+        )
+        functions.CreateCar(new_car)
+
+        print("Προσπάθεια αλλαγής κατάστασης αυτοκινήτου(σε unavailable):")
+        functions.ChangeCarState(new_car)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
     
