@@ -27,10 +27,44 @@ class FilterDialog(QDialog):
         form.addRow("Min HP:", self.hp_input)
         layout.addLayout(form)
         
-        btn = QPushButton("Εφαρμογή")
+        btn = QPushButton("Apply")
         btn.clicked.connect(self.accept)
         layout.addWidget(btn)
+class RentDetails(QDialog):
+    def __init__(self, total_price, parent=None): 
+        super().__init__(parent)
+        self.setWindowTitle("Confirm Reservation")
+        self.setFixedWidth(300)
+        
+        layout = QVBoxLayout(self)
+        
+        # Εμφάνιση Τιμής
+        message = QLabel(f"Η συνολική τιμή είναι: <b>€{total_price}</b>")
+        message.setAlignment(Qt.AlignCenter)
+        message.setStyleSheet("font-size: 16px; margin: 20px;")
+        layout.addWidget(message)
 
+        question = QLabel("Θέλετε να προχωρήσετε στην κράτηση;")
+        question.setAlignment(Qt.AlignCenter)
+        layout.addWidget(question)
+
+        # Buttons
+        button_layout = QHBoxLayout()
+        self.btn_yes = QPushButton("Yes")
+        self.btn_no = QPushButton("No")
+        
+        # Styling
+        self.btn_yes.setStyleSheet("background-color: #2563eb; color: white; padding: 8px; font-weight: bold;")
+        self.btn_no.setStyleSheet("background-color: #ef4444; color: white; padding: 8px; font-weight: bold;")
+        
+        button_layout.addWidget(self.btn_yes)
+        button_layout.addWidget(self.btn_no)
+        
+        layout.addLayout(button_layout)
+
+        # Connections
+        self.btn_yes.clicked.connect(self.accept) # Κλείνει το dialog με True
+        self.btn_no.clicked.connect(self.reject)  # Κλείνει το dialog με False
     def get_values(self):
         p = self.price_input.text().strip()
         y = self.year_input.text().strip()
@@ -412,7 +446,33 @@ class MainDashboard(QMainWindow):
                 col = 0
                 row += 1
         
+    def handle_rent(self, car):
+        # 1. Πρέπει πρώτα να διαλέξει ημερομηνίες (χρησιμοποιούμε το Dialog από πριν)
+        from reservation_page import DatePickerDialog # Αν το έχεις εκεί
+        
+        date_dialog = DatePickerDialog(self)
+        if date_dialog.exec() == QDialog.Accepted:
+            start_str, end_str = date_dialog.get_dates()
+            
+            # Υπολογισμός ημερών (απλό παράδειγμα)
+            st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
+            et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
+            days = (et - st).days
+            if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
+            
+            total_price = days * car['price']
 
+            # 2. Εμφάνιση του RentDetails Dialog
+            confirm_dialog = RentDetails(total_price, self)
+            if confirm_dialog.exec() == QDialog.Accepted:
+                # 3. Αν πατήσει Yes, κάνουμε την κράτηση
+                try:
+                    functions.CreateReservation(self.session_email, start_str, end_str, car["car_id"])
+                    print(f"Κράτηση επιτυχής για το {car['brand']}!")
+                    # Προαιρετικά: Άνοιξε τη σελίδα των κρατήσεων
+                    self.reservations()
+                except Exception as e:
+                    print(f"Σφάλμα κατά την κράτηση: {e}")
     def open_filters(self):
         #TODO handle dates and get car license
         start = "2026-04-14 15:30"
@@ -440,7 +500,6 @@ class MainDashboard(QMainWindow):
                     self.update_grid([]) # an den esteile lista, emfanise keno
             except ValueError:
                 print("Error please enter only numbers!")
-          
     def logout(self):
         from login import LoginWindow
         self.login_window = LoginWindow() 
@@ -650,11 +709,12 @@ class MainDashboard(QMainWindow):
             }
         """)
 
-        btn_select = QPushButton("Select")
-        btn_select.setCursor(Qt.PointingHandCursor)
+        btn_rent = QPushButton("Rent")
+        btn_rent.setCursor(Qt.PointingHandCursor)
+        btn_rent.clicked.connect(lambda: self.handle_rent(car))
 
         if car["state"] == "Available":
-            btn_select.setStyleSheet("""
+            btn_rent.setStyleSheet("""
                 QPushButton {
                     background-color: #2563eb;
                     color: white;
@@ -669,8 +729,8 @@ class MainDashboard(QMainWindow):
                 }
             """)
         else:
-            btn_select.setEnabled(False)
-            btn_select.setStyleSheet("""
+            btn_rent.setEnabled(False)
+            btn_rent.setStyleSheet("""
                 QPushButton {
                     background-color: #dbe3ef;
                     color: #7b8795;
@@ -693,7 +753,7 @@ class MainDashboard(QMainWindow):
         bottom_row.addWidget(btn_details)
         bottom_row.addStretch()
         bottom_row.addWidget(price_label) 
-        bottom_row.addWidget(btn_select)
+        bottom_row.addWidget(btn_rent)
 
         layout.addLayout(top_row)
         layout.addWidget(image_box)
