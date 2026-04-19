@@ -727,7 +727,7 @@ class MainDashboard(QMainWindow):
         if car["state"] == "Available":
             btn_rent.setStyleSheet("""
                 QPushButton {
-                    background-color: #2563eb;
+                    background-color: #1f9d55;
                     color: white;
                     border: none;
                     border-radius: 10px;
@@ -736,7 +736,7 @@ class MainDashboard(QMainWindow):
                     font-weight: 800;
                 }
                 QPushButton:hover {
-                    background-color: #1d4ed8;
+                    background-color: #1F7755;
                 }
             """)
         else:

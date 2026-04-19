@@ -134,7 +134,7 @@ class ReservationsWindow(QWidget):
         toolbar_layout.setContentsMargins(28, 0, 28, 0)
         toolbar_layout.setSpacing(12)
 
-        self.right_info_label = QLabel(f"Showing <b>{len(self.cars)}</b> vehicles")
+        self.right_info_label = QLabel(f"Showing <b>{len(self.cars)}</b> reservations")
         self.right_info_label.setStyleSheet("""
             color: #556070;
             font-size: 14px;
@@ -177,23 +177,6 @@ class ReservationsWindow(QWidget):
         toolbar_layout.setContentsMargins(28, 0, 28, 0)
         toolbar_layout.setSpacing(12)
 
-        # ΝΕΟ ΚΟΥΜΠΙ ΕΠΙΛΟΓΗΣ ΗΜΕΡΟΜΗΝΙΑΣ
-        self.btn_pick_dates = QPushButton("📅 Set Dates")
-        self.btn_pick_dates.setCursor(Qt.PointingHandCursor)
-        self.btn_pick_dates.clicked.connect(self.open_date_picker)
-        self.btn_pick_dates.setStyleSheet("""
-            QPushButton {
-                background-color: #3a5a54;
-                color: white;
-                border-radius: 8px;
-                padding: 8px 16px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #4a6d64;
-            }
-        """)
-        toolbar_layout.addWidget(self.btn_pick_dates)
         toolbar_layout.addStretch()
         # ...
 
@@ -211,13 +194,12 @@ class ReservationsWindow(QWidget):
         scroll.setWidget(scroll_content)
         content_layout.addWidget(scroll)
     def open_date_picker(self):
-        """Αυτή η μέθοδος έλειπε ή ήταν σε λάθος θέση!"""
+
         dialog = DatePickerDialog(self)
         if dialog.exec() == QDialog.Accepted:
             start_date, end_date = dialog.get_dates()
             # Εδώ οι ημερομηνίες είναι ακριβώς στο format που θες
             print(f"Start: {start_date}, End: {end_date}")
-            self.btn_pick_dates.setText(f"📅 {start_date}")
     def update_grid(self, cars_list):
         for i in reversed(range(self.grid.count())):
             widget = self.grid.itemAt(i).widget()
@@ -386,17 +368,6 @@ class ReservationsWindow(QWidget):
                 border-radius: 12px;
             }
         """)
-        def open_date_picker(self):
-            dialog = DatePickerDialog(self)
-            if dialog.exec() == QDialog.Accepted:
-                start_date, end_date = dialog.get_dates()
-                
-                # Εδώ έχεις τις ημερομηνίες έτοιμες για το st = datetime.strptime(...)
-                print(f"Selected Start: {start_date}")
-                print(f"Selected End: {end_date}")
-                
-                # Μπορείς να ενημερώσεις το UI ή να φιλτράρεις τα αυτοκίνητα
-                self.btn_pick_dates.setText(f"📅 {start_date} to {end_date}")
         image_layout = QVBoxLayout(image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
         
@@ -477,7 +448,7 @@ class ReservationsWindow(QWidget):
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.setStyleSheet("""
                 QPushButton {
-                    background-color: #ef4444;
+                    background-color: #BB5327;
                     color: white;
                     border: none;
                     border-radius: 10px;
