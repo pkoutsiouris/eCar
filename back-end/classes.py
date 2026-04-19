@@ -142,7 +142,7 @@ def main():
         functions.ChangeCarPrice(new_car, 222.0)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
-        """
+        
 
 # Test: Edit car state
     try:
@@ -155,7 +155,30 @@ def main():
         functions.ChangeCarState(new_car)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
+        """
     
+    # --- Test: Get User Reservations ---
+    try:
+        test_email_res = "marisa@test.com" # Βάλε ένα email που σίγουρα υπάρχει στη βάση
+        print(f"\n--- Προσπάθεια ανάκτησης κρατήσεων για το email: {test_email_res} ---")
+        
+        # 1. (Προαιρετικά) Μπορούμε πρώτα να φτιάξουμε μια κράτηση για να είμαστε σίγουροι ότι υπάρχει
+        # start_date = "2026-05-01 10:00"
+        # end_date = "2026-05-05 10:00"
+        # car_id = 1 # Υποθέτουμε ότι υπάρχει αυτοκίνητο με id 1
+        # functions.CreateReservation(test_email_res, start_date, end_date, car_id)
+        
+        # 2. Τεστάρουμε την GetUserReservations
+        reservations = functions.GetUserReservations(test_email_res)
+        
+        if reservations:
+            print("Βρέθηκε κράτηση (ή κρατήσεις):")
+            print(reservations)
+        else:
+            print("Δεν βρέθηκε καμία κράτηση για αυτόν τον χρήστη ή ο χρήστης δεν υπάρχει.")
+            
+    except Exception as e:
+        print(f"Σφάλμα κατά την εκτέλεση του GetUserReservations test: {e}")
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":
