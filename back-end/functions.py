@@ -34,8 +34,10 @@ def CheckCarExists(car: classes.Car):
         print(f"Σφάλμα σύνδεσης με τη βάση (checkcarexists): {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GetCars():
     try:
@@ -49,8 +51,10 @@ def GetCars():
         print(f"Σφάλμα σύνδεσης με τη βάση from getcars: {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def CreateCar(car: classes.Car):
     try:
@@ -73,8 +77,10 @@ def CreateCar(car: classes.Car):
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
         return False
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GetUsers():
     try:
@@ -87,8 +93,10 @@ def GetUsers():
         print(f"Σφάλμα κατά την ανάκτηση χρηστών (GetUsers): {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def FilterCars(price: float, year: int, cc: int , horses: int):
     try:
@@ -157,8 +165,10 @@ def ChangeCarDescr(car : classes.Car, new_desc: str):
         return False
     
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def ChangeCarPrice(car : classes.Car, new_price: float):
     try:
@@ -183,8 +193,10 @@ def ChangeCarPrice(car : classes.Car, new_price: float):
         return False
     
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def ChangeCarState(car : classes.Car):
     try:
@@ -210,8 +222,10 @@ def ChangeCarState(car : classes.Car):
         return False
     
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def CheckUserExists(user: classes.User):
     try:
@@ -396,8 +410,10 @@ def GetUserSession(email:str):
         print(f"Could not find users: {err}")
         return None
     finally:
-        db.close()
-        conn.close()   
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()   
 
 def GetCarByLicense(license:str):
     try:
@@ -411,8 +427,10 @@ def GetCarByLicense(license:str):
         print(f"Error getting car by license plate: {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 
 def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
@@ -472,6 +490,36 @@ def GetUserReservations(email:str):
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
         return None
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def DeleteReservation(reservation_id: int):
+    try:
+        conn, db = ConnectDB() 
+
+        # 1. Ελέγχουμε αν υπάρχει η κράτηση
+        check_query = "SELECT * FROM reservations WHERE reservation_id = %s"
+        db.execute(check_query, (reservation_id,))
+        res = db.fetchone()
+        
+        if res is None:
+            print(f"Error: The reservation with ID {reservation_id} not found.")  
+            return False
+            
+        # 2. Προχωράμε στη διαγραφή
+        delete_query = "DELETE FROM reservations WHERE reservation_id = %s"
+        db.execute(delete_query, (reservation_id,))
+        conn.commit()
+
+        print(f"The reservation with ID {reservation_id} deleted.")
+        return True
+
+    except mysql.connector.Error as err:
+        print(f"Error: reservation was not deleted {err}")   
+        return False
     finally:
         if 'db' in locals() and db is not None:
             db.close()
