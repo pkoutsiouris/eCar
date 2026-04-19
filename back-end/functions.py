@@ -331,3 +331,75 @@ def GetSortedCars(sort_by: str, descending: bool = False):
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
+
+def GetUserSession(email:str):
+    try:
+        conn, db = ConnectDB()
+        query = "SELECT * FROM users WHERE email=%s"
+        db.execute(query,(email, ))
+        user = db.fetchone()
+        return user
+    except mysql.connector.Error as err:
+        print(f"Could not find users: {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()   
+
+def GetCarByLicense(license:str):
+    try:
+        conn,db = ConnectDB()
+        query = "select * from cars where license_plate=%s"
+        db.execute(query,(license, ))
+        print("afer db execute\n")
+        car = db.fetchone()
+        return car
+    except mysql.connector.Error as err:
+        print(f"Error getting car by license plate: {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
+
+
+def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
+    user=GetUserSession(email)
+    print("From functions: ",user["user_id"])
+    try:
+
+        conn, db = ConnectDB()
+        user = GetUserSession(email)
+        st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
+        et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
+        """ st_str = st.strftime("%Y-%m-%d %H:%M")
+        et_str = et.strftime("%Y-%m-%d %H:%M") """
+        print(st)
+        print(et)
+        total_price = 100
+        reservation_status=True
+        query=query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
+        db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
+        conn.commit()
+        return True
+    except mysql.connector.Error as err:
+        print(f"Could not find users: {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()   
+
+def GetUserReservations(email:str):
+    try:
+        conn,db = ConnectDB()
+        user = GetUserSession(email)
+        query = "select * from reservations where user_id=%s"
+        db.execute(query,(user["user_id"], ))
+        print("afer db execute\n")
+        reservation = db.fetchone()
+        return reservation
+    except mysql.connector.Error as err:
+        print(f"Error getting car by license plate: {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
