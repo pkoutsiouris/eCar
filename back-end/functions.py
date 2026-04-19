@@ -422,24 +422,37 @@ def CreateReservation(email:str,start_date: str, end_date:str, car_id:int):
 
         conn, db = ConnectDB()
         user = GetUserSession(email)
+
+        if user is None:
+            print(f"Reservation Failure: Email not found '{email}'.")
+            return False
+            
+        print("From functions (user_id): ", user["user_id"])
+
         st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
+
         """ st_str = st.strftime("%Y-%m-%d %H:%M")
         et_str = et.strftime("%Y-%m-%d %H:%M") """
-        print(st)
-        print(et)
+        #print(st)
+        #print(et)
         total_price = 100
         reservation_status=True
+
         query=query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
         conn.commit()
+
+        print("Reservation completed!")
         return True
     except mysql.connector.Error as err:
         print(f"Could not find users: {err}")
         return None
     finally:
-        db.close()
-        conn.close()   
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()   
 
 def GetUserReservations(email:str):
     try:
@@ -454,7 +467,7 @@ def GetUserReservations(email:str):
         db.execute(query,(user["user_id"], ))
         print("afer db execute\n")
 
-        reservation = db.fetchone()
+        reservation = db.fetchall()
         return reservation
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
