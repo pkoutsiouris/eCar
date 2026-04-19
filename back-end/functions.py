@@ -417,14 +417,22 @@ def GetUserReservations(email:str):
     try:
         conn,db = ConnectDB()
         user = GetUserSession(email)
+
+        if user is None:
+            print(f"Σφάλμα: Δεν βρέθηκε χρήστης με το email '{email}' στη βάση.")
+            return None
+
         query = "select * from reservations where user_id=%s"
         db.execute(query,(user["user_id"], ))
         print("afer db execute\n")
+
         reservation = db.fetchone()
         return reservation
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
         return None
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
