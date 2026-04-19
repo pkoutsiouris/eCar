@@ -9,12 +9,12 @@ from PySide6.QtGui import QPixmap, QIcon
 
 
 class ReservationsWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self,session_email:str):
         super().__init__()
         self.setWindowTitle("Car Rental - Reservations")
         self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
-        
+        self.session_email=session_email
         # Τραβάμε τα αυτοκίνητα
         db_cars = functions.GetCars()
 

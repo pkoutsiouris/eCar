@@ -449,7 +449,7 @@ class MainDashboard(QMainWindow):
 
     def reservations(self):  
         from reservation_page import ReservationsWindow
-        self.reservations_window = ReservationsWindow() 
+        self.reservations_window = ReservationsWindow(self.session_email) 
         self.reservations_window.show()
         self.close()
 
