@@ -6,10 +6,13 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QIcon, QAction
+from PySide6 import QtGui
+from PySide6.QtGui import QPixmap, QIcon, QAction, QFontDatabase
 from back_end import authentication as auth
 from main_user import MainDashboard
 from back_end.session import session
+#TODO: Custom font
+#QtGui.QFontDatabase.addApplicationFont('assets/fonts/Modern_Mono.otf')
 
 
 class ResizableLogo(QLabel):
@@ -77,6 +80,7 @@ class LoginWindow(QWidget):
         logo_label.setAlignment(Qt.AlignCenter)
         logo_label.setStyleSheet("""
             color: white;
+            font-family:Modern Mono;
             font-size: 34px;
             font-weight: bold;
             letter-spacing: 2px;
@@ -253,7 +257,10 @@ class LoginWindow(QWidget):
             action.setIcon(QIcon('assets/eye_hide.png'))
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = LoginWindow()
-    window.show()
-    sys.exit(app.exec())
+    try:
+        app = QApplication(sys.argv)
+        window = LoginWindow()
+        window.show()
+        sys.exit(app.exec())
+    except Exception as e:
+        print(f"Κρίσιμο σφάλμα: {e}")
