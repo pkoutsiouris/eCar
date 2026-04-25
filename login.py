@@ -45,13 +45,13 @@ class ResizableLogo(QLabel):
 class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("eCar Rental Login")
+        self.setWindowTitle("eCar Rental-Login")
         self.setWindowIcon(QIcon('assets/icon.png'))
         
 
         self.bg_label = QLabel(self)
         self.bg_label.lower() 
-        self.original_pixmap = QPixmap('assets/bg.jpg') 
+        self.original_pixmap = QPixmap('assets/bg.png') 
 
         # MAIN LAYOUT
         main_layout = QVBoxLayout()
