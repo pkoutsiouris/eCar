@@ -190,6 +190,8 @@ class MainDashboard(QMainWindow):
         btn_reservations = self.make_sidebar_button("Reservations")
         btn_reservations.clicked.connect(self.reservations)
         btn_settings = self.make_sidebar_button("Settings")
+        btn_settings.clicked.connect(self.show_settings)
+
         btn_logout = self.make_sidebar_button("Logout")
 
         self.nav_group.addButton(btn_dashboard)
@@ -415,9 +417,12 @@ class MainDashboard(QMainWindow):
         content_layout.addWidget(scroll)
         # Φέρνουμε τη σελίδα των Reservations από το άλλο αρχείο
         self.res_page = ReservationsWindow(self.session_email)
-        # Βάζουμε τις 2 σελίδες στο QStackedWidget (Στοίβα)
+        self.settings_page = self.create_settings_page()
+
+        # Βάζουμε τις 3 σελίδες στο QStackedWidget
         self.stacked_widget.addWidget(self.dashboard_container) # Index 0
         self.stacked_widget.addWidget(self.res_page)            # Index 1
+        self.stacked_widget.addWidget(self.settings_page)       # Index 2         # Index 1
 
 
     
@@ -516,6 +521,201 @@ class MainDashboard(QMainWindow):
         self.login_window = LoginWindow() 
         self.login_window.show()
         self.close()    
+
+    def show_settings(self):
+        self.stacked_widget.setCurrentIndex(2)
+
+
+    def create_settings_page(self):
+        settings_page = QWidget()
+        settings_page.setStyleSheet("background-color: transparent;")
+
+        content_layout = QVBoxLayout(settings_page)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+
+        banner = QFrame()
+        banner.setFixedHeight(190)
+        banner.setStyleSheet("""
+            QFrame {
+                border-top-right-radius: 20px;
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #6a9a83,
+                    stop:1 #3a5a54
+                );
+            }
+        """)
+
+        banner_layout = QVBoxLayout(banner)
+        banner_layout.setContentsMargins(32, 24, 32, 24)
+        banner_layout.setSpacing(10)
+
+        title = QLabel("Settings")
+        title.setStyleSheet("""
+            color: white;
+            font-size: 34px;
+            font-weight: 800;
+            background: transparent;
+        """)
+
+        subtitle = QLabel("Change your account password.")
+        subtitle.setStyleSheet("""
+            color: rgba(255,255,255,0.88);
+            font-size: 14px;
+            font-weight: 500;
+            background: transparent;
+        """)
+
+        banner_layout.addStretch()
+        banner_layout.addWidget(title)
+        banner_layout.addWidget(subtitle)
+        banner_layout.addSpacing(8)
+
+        content_layout.addWidget(banner)
+
+        body = QWidget()
+        body.setStyleSheet("background-color: #f5f7fb;")
+
+        body_layout = QVBoxLayout(body)
+        body_layout.setContentsMargins(28, 28, 28, 28)
+        body_layout.setSpacing(18)
+
+        form_card = QFrame()
+        form_card.setFixedWidth(520)
+        form_card.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border: 1px solid #d1ddd9;
+                border-radius: 15px;
+            }
+        """)
+
+        form_layout = QVBoxLayout(form_card)
+        form_layout.setContentsMargins(28, 28, 28, 28)
+        form_layout.setSpacing(14)
+
+        card_title = QLabel("Change Password")
+        card_title.setStyleSheet("""
+            color: #1d2736;
+            font-size: 22px;
+            font-weight: 800;
+            background: transparent;
+            border: none;
+        """)
+
+        
+
+        self.old_password_input = QLineEdit()
+        self.old_password_input.setPlaceholderText("Old password")
+        self.old_password_input.setEchoMode(QLineEdit.Password)
+        self.old_password_input.setMinimumHeight(44)
+
+        self.new_password_input = QLineEdit()
+        self.new_password_input.setPlaceholderText("New password")
+        self.new_password_input.setEchoMode(QLineEdit.Password)
+        self.new_password_input.setMinimumHeight(44)
+
+        self.confirm_password_input = QLineEdit()
+        self.confirm_password_input.setPlaceholderText("Confirm new password")
+        self.confirm_password_input.setEchoMode(QLineEdit.Password)
+        self.confirm_password_input.setMinimumHeight(44)
+
+        input_style = """
+            QLineEdit {
+                background-color: #f8fafc;
+                color: #1f2937;
+                border: 1px solid #d1ddd9;
+                border-radius: 10px;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #6a9a83;
+                background-color: white;
+            }
+        """
+
+        self.old_password_input.setStyleSheet(input_style)
+        self.new_password_input.setStyleSheet(input_style)
+        self.confirm_password_input.setStyleSheet(input_style)
+
+        btn_change_password = QPushButton("Change Password")
+        btn_change_password.setCursor(Qt.PointingHandCursor)
+        btn_change_password.setMinimumHeight(46)
+        btn_change_password.clicked.connect(self.change_password)
+        btn_change_password.setStyleSheet("""
+            QPushButton {
+                background-color: #6a9a83;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                padding: 10px 18px;
+                font-size: 14px;
+                font-weight: 800;
+            }
+            QPushButton:hover {
+                background-color: #5a8571;
+            }
+            QPushButton:pressed {
+                background-color: #4e7462;
+                padding-top: 12px;
+                padding-bottom: 8px;
+            }
+        """)
+
+        self.password_status_label = QLabel("")
+        self.password_status_label.setStyleSheet("""
+            color: #6b7788;
+            font-size: 13px;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+        """)
+
+        form_layout.addWidget(card_title)
+        form_layout.addSpacing(8)
+        form_layout.addWidget(self.old_password_input)
+        form_layout.addWidget(self.new_password_input)
+        form_layout.addWidget(self.confirm_password_input)
+        form_layout.addSpacing(8)
+        form_layout.addWidget(btn_change_password)
+        form_layout.addWidget(self.password_status_label)
+
+        body_layout.addWidget(form_card, alignment=Qt.AlignTop | Qt.AlignHCenter)
+        body_layout.addStretch()
+
+        content_layout.addWidget(body)
+
+        return settings_page
+
+
+    def change_password(self):
+        old_password = self.old_password_input.text().strip()
+        new_password = self.new_password_input.text().strip()
+        confirm_password = self.confirm_password_input.text().strip()
+
+        if not old_password or not new_password or not confirm_password:
+            self.password_status_label.setText("Please fill in all fields.")
+            self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;")
+            return
+
+        if new_password != confirm_password:
+            self.password_status_label.setText("New passwords do not match.")
+            self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;")
+            return
+
+        success, message = functions.ChangePassword(self.session_email, old_password, new_password)
+
+        if success:
+            self.old_password_input.clear()
+            self.new_password_input.clear()
+            self.confirm_password_input.clear()
+            self.password_status_label.setText(message)
+            self.password_status_label.setStyleSheet("color: #1f9d55; font-size: 13px; font-weight: 600; background: transparent; border: none;")
+        else:
+            self.password_status_label.setText(message)
+            self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;") 
 
     def reservations(self):  
         
