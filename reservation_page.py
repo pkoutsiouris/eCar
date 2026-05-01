@@ -47,9 +47,13 @@ class ReservationsWindow(QWidget):
     def __init__(self,session_email:str):
         super().__init__()
         self.session_email=session_email
+      
         # Τραβάμε τα αυτοκίνητα
         #db_cars = functions.GetUserReservations(session_email)
-        db_cars = functions.GetCars()
+        print(session_email)
+        db_cars = functions.GetReservedCarsByUser(session_email)
+       # reservation= functions.GetUserReservations(session_email)
+        print(db_cars)
         if db_cars:
             self.cars = db_cars
         else:
@@ -443,9 +447,10 @@ class ReservationsWindow(QWidget):
                 background-color: #f8fafc;
             }
         """)
-
+        reservation=functions.GetReservationByCarID(car['car_id'],self.session_email)
+        print(reservation)
         btn_cancel = QPushButton("Cancel")
-        btn_cancel.clicked.connect(lambda: self.cancel_reservation(self.reservation['reservation_id']))
+        btn_cancel.clicked.connect(lambda: self.cancel_reservation(reservation['reservation_id']))
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.setStyleSheet("""
                 QPushButton {
@@ -489,7 +494,7 @@ class ReservationsWindow(QWidget):
         if success:
             print(f"Reservation {res_id} deleted.")
             # Refresh the UI by fetching the updated list
-            updated_list = functions.GetUserReservations(self.session_email)
+            updated_list = functions.GetReservedCarsByUser(self.session_email) 
             self.update_grid(updated_list if updated_list else [])
         else:
             print("Failed to cancel reservation.")

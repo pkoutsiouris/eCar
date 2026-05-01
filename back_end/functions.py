@@ -477,3 +477,42 @@ def DeleteReservation(reservation_id: int):
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
+
+def GetReservedCarsByUser(user_email):
+    try:
+        conn, db = ConnectDB()
+        user = GetUserSession(user_email)
+        query = """
+        SELECT c.*, r.start_date, r.end_date, r.total_price, r.reservation_status
+        FROM cars c
+        INNER JOIN reservations r ON c.car_id = r.car_id
+        WHERE r.user_id = %s
+        """
+
+        db.execute(query, (user['user_id'],))
+        cars = db.fetchall()
+
+        return cars
+
+    except mysql.connector.Error as err:
+        print(f"Error getting user's reserved cars: {err}")
+        return None
+
+    finally:
+        db.close()
+        conn.close()
+
+def GetReservationByCarID(car_id: int, user_email):
+    try:
+        conn, db = ConnectDB()
+        user_id = user = GetUserSession(user_email)
+        query = "SELECT * FROM reservations WHERE car_id = %s AND user_id = %s"
+        db.execute(query, (car_id, user_id['user_id']))
+        reservation = db.fetchone()
+        return reservation
+    except mysql.connector.Error as err:
+        print(f"Error getting reservation by car and user ID: {err}")
+        return None
+    finally:
+        db.close()
+        conn.close()
