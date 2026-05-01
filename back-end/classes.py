@@ -155,7 +155,7 @@ def main():
         functions.ChangeCarState(new_car)
     except Exception as e:
         print(f"Σφάλμα κατά την επικοινωνία με τη βάση from main: {e}")
-        """
+        
     
     # --- Test: Get User Reservations ---
     try:
@@ -179,6 +179,32 @@ def main():
             
     except Exception as e:
         print(f"Σφάλμα κατά την εκτέλεση του GetUserReservations test: {e}")
+        """
+
+    # Test: Change password
+    try:
+        test_user = User(
+            username="Ann_Spyr",
+            password="tu88p5l", 
+            role="Customer", 
+            firstname="Άννα", 
+            surname="Σπυριδούλα", 
+            email="anna@example.com", 
+            phone=6911111111, 
+            license_no=98765432, 
+            license_type="B"
+        )
+        
+        functions.RegisterUser(test_user)
+
+        new_secret_password = "^Tv1vM^a!%"
+
+        print(f"Προσπάθεια αλλαγής κωδικού για τον χρήστη '{test_user.username}'...")
+
+        functions.ChangePassword(test_user, new_secret_password)
+
+    except Exception as e:
+        print(f"Σφάλμα κατά την εκτέλεση του τεστ στη main: {e}")
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":

@@ -272,6 +272,34 @@ def RegisterUser(user: classes.User):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
+def ChangePassword(user: classes.User, new_password: str):
+    try:
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckUserExists(user):
+            print("User doesn't exist")  
+            return False
+        
+        query="update users set user_password=%s where username=%s"
+        db.execute(query, (new_password,user.username))
+        conn.commit()
+        print("Επιτυχία")
+        return True
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
 def GiveDealerAccess(email: str):
     try:
         conn, db = ConnectDB()
