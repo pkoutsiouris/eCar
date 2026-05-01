@@ -447,3 +447,33 @@ def ChangePassword(user: classes.User, new_password: str):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
+
+def DeleteReservation(reservation_id: int):
+    try:
+        conn, db = ConnectDB() 
+
+        # 1. Ελέγχουμε αν υπάρχει η κράτηση
+        check_query = "SELECT * FROM reservations WHERE reservation_id = %s"
+        db.execute(check_query, (reservation_id,))
+        res = db.fetchone()
+        
+        if res is None:
+            print(f"Error: The reservation with ID {reservation_id} not found.")  
+            return False
+            
+        # 2. Προχωράμε στη διαγραφή
+        delete_query = "DELETE FROM reservations WHERE reservation_id = %s"
+        db.execute(delete_query, (reservation_id,))
+        conn.commit()
+
+        print(f"The reservation with ID {reservation_id} deleted.")
+        return True
+
+    except mysql.connector.Error as err:
+        print(f"Error: reservation was not deleted {err}")   
+        return False
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
