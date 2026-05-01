@@ -394,3 +394,24 @@ def UpdateUserRole(email: str, new_role: str):
     finally:
         db.close()
         conn.close()
+def DeleteUserByEmail(email: str):
+    try:
+        conn, db = ConnectDB()
+        # Διαγραφή του χρήστη βάσει email
+        query = "DELETE FROM users WHERE email = %s"
+        db.execute(query, (email,))
+        conn.commit()
+        
+        # Ελέγχουμε αν όντως διαγράφηκε κάποια γραμμή
+        if db.rowcount > 0:
+            print(f"User {email} deleted successfully from database.")
+            return True
+        else:
+            print(f"User {email} not found.")
+            return False
+    except mysql.connector.Error as err:
+        print(f"Σφάλμα κατά τη διαγραφή χρήστη: {err}")
+        return False
+    finally:
+        db.close()
+        conn.close()

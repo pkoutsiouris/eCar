@@ -243,9 +243,30 @@ class AdminWindow(QMainWindow):
         return page
 
     def delete_user(self, row):
-        email = self.user_table.item(row, 2).text()
-        print(f"Deleting user: {email}")
-        self.user_table.removeRow(row)
+        # 1. Παίρνουμε το email από τη στήλη 2 της συγκεκριμένης σειράς
+        email_item = self.user_table.item(row, 2)
+        if not email_item:
+            return
+            
+        email = email_item.text()
+        
+        # Προαιρετικό: Προσθήκη επιβεβαίωσης πριν τη διαγραφή
+        # (Χρειάζεται import QMessageBox από PySide6.QtWidgets)
+        
+        # 2. Κλήση της συνάρτησης διαγραφής από το back-end[cite: 6]
+        success = functions.DeleteUserByEmail(email)
+        
+        if success:
+            # 3. Αφαίρεση της σειράς από το QTableWidget οπτικά
+            self.user_table.removeRow(row)
+            print(f"Successfully removed {email} from UI.")
+            
+            # ΣΗΜΑΝΤΙΚΟ: Μετά τη διαγραφή μιας σειράς, τα row indexes των επόμενων 
+            # σειρών αλλάζουν. Για να αποφύγεις bugs, μπορείς να ξανακαλέσεις 
+            # τη μέθοδο που γεμίζει τον πίνακα αν υπάρχουν πολλοί χρήστες.
+            # self.create_users_page() 
+        else:
+            print(f"Failed to delete user {email} from database.")
 
     def logout(self):
         from login import LoginWindow
