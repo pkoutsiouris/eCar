@@ -7,8 +7,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
 
-# Import functions αν υπάρχουν στο back_end
-# from back_end import functions 
+from back_end import functions
 
 class AdminWindow(QMainWindow):
     def __init__(self, session_email: str):
@@ -162,35 +161,63 @@ class AdminWindow(QMainWindow):
         content.addStretch()
         layout.addLayout(content)
         return page
-
+    
     def create_users_page(self):
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.create_banner("Manage Users", "View and moderate registered accounts."))
 
-        # Table
-        self.user_table = QTableWidget(0, 4)
-        self.user_table.setHorizontalHeaderLabels(["ID", "Full Name", "Email", "Actions"])
+        # Αυξάνουμε τις στήλες σε 5 για να χωρέσει το νέο κουμπί
+        self.user_table = QTableWidget(0, 5)
+        self.user_table.setHorizontalHeaderLabels(["ID", "Full Name", "Email", "Role", "Actions"])
         self.user_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.user_table.setStyleSheet("QTableWidget { background: white; border: none; }")
         
-        # Dummy Data
-        users = [("1", "Giannis Papadopoulos", "giannis@mail.com"), ("2", "Maria K.", "maria@mail.com")]
-        for row_idx, data in enumerate(users):
-            self.user_table.insertRow(row_idx)
-            self.user_table.setItem(row_idx, 0, QTableWidgetItem(data[0]))
-            self.user_table.setItem(row_idx, 1, QTableWidgetItem(data[1]))
-            self.user_table.setItem(row_idx, 2, QTableWidgetItem(data[2]))
-            
-            btn_del = QPushButton("Delete")
-            btn_del.setStyleSheet("background: #ef4444; color: white; border-radius: 5px; padding: 5px; margin: 2px;")
-            btn_del.clicked.connect(lambda ch, r=row_idx: self.delete_user(r))
-            self.user_table.setCellWidget(row_idx, 3, btn_del)
+        # Ανάκτηση πραγματικών δεδομένων από τη βάση
+        users_data = functions.GetUsers() 
+        
+        if users_data:
+            for row_idx, user in enumerate(users_data):
+                self.user_table.insertRow(row_idx)
+                self.user_table.setItem(row_idx, 0, QTableWidgetItem(str(user['user_id'])))
+                self.user_table.setItem(row_idx, 1, QTableWidgetItem(f"{user['first_name']} {user['surname']}"))
+                self.user_table.setItem(row_idx, 2, QTableWidgetItem(user['email']))
+                self.user_table.setItem(row_idx, 3, QTableWidgetItem(user['user_role']))
+                
+                # Layout για τα κουμπιά στη στήλη Actions
+                actions_widget = QWidget()
+                actions_layout = QHBoxLayout(actions_widget)
+                actions_layout.setContentsMargins(2, 2, 2, 2)
+
+                # Κουμπί Delete
+                btn_del = QPushButton("Delete")
+                btn_del.setStyleSheet("background: #ef4444; color: white; border-radius: 5px; padding: 5px;")
+                btn_del.clicked.connect(lambda ch, r=row_idx: self.delete_user(r))
+                
+                # ΚΟΥΜΠΙ MAKE ADMIN
+                btn_admin = QPushButton("Make Admin")
+                btn_admin.setStyleSheet("background: #10b981; color: white; border-radius: 5px; padding: 5px;")
+                # Σύνδεση με τη νέα μέθοδο promote_to_admin
+                btn_admin.clicked.connect(lambda ch, e=user['email'], r=row_idx: self.promote_to_admin(e, r))
+
+                actions_layout.addWidget(btn_admin)
+                actions_layout.addWidget(btn_del)
+                self.user_table.setCellWidget(row_idx, 4, actions_widget)
 
         layout.addWidget(self.user_table)
         return page
-
+    def promote_to_admin(self, email, row):
+        # Κλήση της συνάρτησης από το functions.py[cite: 2]
+        success = functions.GiveAdminAccess(email)
+        
+        if success:
+            print(f"User {email} is now an Admin.")
+            # Ενημέρωση του UI στη στήλη "Role" (στήλη 3)
+            self.user_table.setItem(row, 3, QTableWidgetItem("Admin"))
+            # Προαιρετικά: Απενεργοποίηση του κουμπιού αφού έγινε ήδη admin
+        else:
+            print(f"Failed to promote user {email}.")
     def create_logs_page(self):
         page = QWidget()
         layout = QVBoxLayout(page)
