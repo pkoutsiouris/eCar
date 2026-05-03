@@ -435,10 +435,8 @@ def ChangePassword(email: str, old_password: str, new_password: str):
 
         if conn is None or db is None:
             return False, "Failed to connect with database."
-
-        query = "SELECT user_password FROM users WHERE email = %s"
-        db.execute(query, (email,))
-        user = db.fetchone()
+        
+        user = GetUserSession(email)
 
         if user is None:
             return False, "User does not exist."
