@@ -1,9 +1,9 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox, 
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from back_end import functions
 from datetime import datetime
 from reservation_page import ReservationsWindow
@@ -501,7 +501,7 @@ class MainDashboard(QMainWindow):
                 
                 self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
 
-
+# ALAGH AVAILABILITY
         row = 0
         col = 0
         for car in cars_list:
@@ -773,11 +773,22 @@ class MainDashboard(QMainWindow):
             self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;")
     
     def reservations(self):  
-        
         self.stacked_widget.setCurrentIndex(1)
+
     def show_dashboard(self):
-        
         self.stacked_widget.setCurrentIndex(0)
+        self.refresh_dashboard()
+    
+
+
+
+
+    def refresh_dashboard(self):
+        self.cars = functions.GetCars() or []
+        self.update_grid(self.cars)
+        available_count = sum(1 for car in self.cars if car["state"] == "Available")
+        self.right_info_label.setText(f"Showing <b>{available_count}</b> vehicles")
+    
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
         btn.setCheckable(True)
