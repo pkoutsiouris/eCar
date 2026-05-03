@@ -189,7 +189,7 @@ class AdminWindow(QMainWindow):
                 role_combo.addItems(roles)
                 # Θέτουμε την τρέχουσα τιμή βάσει της βάσης δεδομένων
                 role_combo.setCurrentText(user['user_role'])
-                role_combo.setStyleSheet("color: black; padding: 5px;")
+                role_combo.setStyleSheet("color: white; padding: 5px;")
                 self.user_table.setCellWidget(row_idx, 3, role_combo)
                 
                 # --- ACTIONS LAYOUT ---
