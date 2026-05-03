@@ -203,7 +203,7 @@ def RegisterUser(user: classes.User):
                           user.license_type))
         conn.commit()
         msg="Registered user with email: " + str(user.email)
-        WriteErrorLog("RegisterUser",msg)
+        WriteLog("RegisterUser",msg)
         return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
