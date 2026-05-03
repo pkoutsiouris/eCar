@@ -574,3 +574,22 @@ def GetReservationByCarID(car_id: int, user_email):
     finally:
         db.close()
         conn.close()
+
+def ShowReservations():
+    try:
+        conn,db = ConnectDB()
+
+        query = "select * from reservations"
+        db.execute(query)
+        reservations = db.fetchall()
+        return reservations
+
+    except Exception as e:
+        print(f"Error: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
