@@ -1,4 +1,5 @@
 import sys
+import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox, 
@@ -947,8 +948,18 @@ class MainDashboard(QMainWindow):
         car_image.setAlignment(Qt.AlignCenter)
         car_image.setStyleSheet("background: transparent; border: none;")
 
-        img_path = car["image_path"].lstrip("/")
-        pixmap = QPixmap(img_path)
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        print("BASE_DIR IS ", BASE_DIR)
+        
+        # 1. Add the .png extension to the car's image name
+        filename = f"{car['image_path']}.png"
+
+        # 2. Join BASE_DIR, the "imgs" folder, and the filename all together
+        full_path = os.path.join(BASE_DIR, "imgs", filename)
+
+        print(full_path)
+        pixmap = QPixmap(full_path)
     
         if not pixmap.isNull():
             scaled_pixmap = pixmap.scaled(
