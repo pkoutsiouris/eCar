@@ -455,13 +455,16 @@ class MainDashboard(QMainWindow):
         row = 0
         col = 0
         for car in cars_list:
-            card = self.create_car_card(car)
-            self.grid.addWidget(card, row, col)
-            col += 1
-            if col > 2:
-                col = 0
-                row += 1
+            if car['state'] == 'Available':
+                card = self.create_car_card(car)
+                self.grid.addWidget(card, row, col)
+                col += 1
+                if col > 2:
+                    col = 0
+                    row += 1
         
+
+            
  
     def open_filters(self):
         #TODO handle dates and get car license
