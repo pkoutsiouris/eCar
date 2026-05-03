@@ -9,7 +9,7 @@ def ConnectDB():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="8716",
+            password="",
             database="eCar_db"
         )
         
