@@ -66,7 +66,7 @@ def CreateCar(car: classes.Car):
         "image_path, price, availability) VALUES (" \
         "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
         db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
-                          car.desc,car.fuel,car.trans,car.horsepower,car.imgPath,car.price,car.availability))
+                          car.desc,car.fuel,car.trans,car.horsepower,car.plate,car.price,car.availability))
         conn.commit()
         return True
     except mysql.connector.Error as err:
@@ -362,6 +362,10 @@ def CreateReservation(email:str,start_date, end_date,car_id):
         query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
         conn.commit()
+        query = "UPDATE cars SET availability=0 , state='Unavailable' WHERE car_id=%s"
+        db.execute(query,(car_id,))
+        conn.commit()
+
         return True
     except mysql.connector.Error as err:
         print(f"Could not find users: {err}")
@@ -478,6 +482,11 @@ def DeleteReservation(reservation_id: int):
         delete_query = "DELETE FROM reservations WHERE reservation_id = %s"
         db.execute(delete_query, (reservation_id,))
         conn.commit()
+        print("Reservation car id: ", res['car_id'])
+        query = "UPDATE cars SET availability=1 , state='Available' WHERE car_id=%s"
+        db.execute(query,(res['car_id'],))
+        conn.commit()
+
 
         print(f"The reservation with ID {reservation_id} deleted.")
         return True

@@ -455,13 +455,16 @@ class MainDashboard(QMainWindow):
         row = 0
         col = 0
         for car in cars_list:
-            card = self.create_car_card(car)
-            self.grid.addWidget(card, row, col)
-            col += 1
-            if col > 2:
-                col = 0
-                row += 1
+            if car['state'] == 'Available':
+                card = self.create_car_card(car)
+                self.grid.addWidget(card, row, col)
+                col += 1
+                if col > 2:
+                    col = 0
+                    row += 1
         
+
+            
  
     def open_filters(self):
         #TODO handle dates and get car license
@@ -471,7 +474,7 @@ class MainDashboard(QMainWindow):
         et = datetime.strptime(end ,"%Y-%m-%d %H:%M")
         car = functions.GetCarByLicense("ABC1234")
         functions.CreateReservation(self.session_email,start,end,car["car_id"])
-        reservation= function.GetUserReservations(self.session_email)
+        reservation= functions.GetUserReservations(self.session_email)
         print("Reservation for the mail: ",reservation)
         dialog = FilterDialog(self)
         if dialog.exec():
