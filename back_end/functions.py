@@ -90,50 +90,45 @@ def GetUsers():
         db.close()
         conn.close()
 
-def FilterCars(price: float, year: int, cc: int , horses: int):
+def FilterCars(price: float, year: int, cc: int, horses: int):
     try:
-        conn,db=ConnectDB()
-        prflag=False
-        yrflag=False
-        ccflag=False
-        horseflag=False
-        query="select * from cars"
+        conn, db = ConnectDB()
+
+        query = "SELECT * FROM cars WHERE 1=1"
+        params = []
+
         if price is not None:
-            query=query+ " where "
-            prflag=True
-            query=query+" price='"+str(price)+"'"
+            query += " AND price <= %s"
+            params.append(price)
 
         if year is not None:
-            if prflag:
-                query=query+"and production_year='"+str(year)+"'"
-            else:
-                query=query+" production_year='"+str(year)+"'"
-            yrflag=True
+            query += " AND production_year >= %s"
+            params.append(year)
 
         if cc is not None:
-            if prflag or yrflag:
-                query=query + "and cc='"+str(cc)+"'"
-            else:
-                query=query + " cc='"+str(cc)+"'"
-            ccflag=True
+            query += " AND cc >= %s"
+            params.append(cc)
+
         if horses is not None:
-            if prflag or yrflag or ccflag:
-                query=query+" and horsepower='"+str(horses)+"'"
-            else:
-                query=query+" horsepower='"+str(horses)+"'"
-            horseflag=True
-            
-        query=query+";"
-        db.execute(query)
+            query += " AND horsepower >= %s"
+            params.append(horses)
+
+        query += ";"
+
+        db.execute(query, tuple(params))
         cars = db.fetchall()
+
         return cars
 
     except mysql.connector.Error as err:
-        print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
-        return False
+        print(f"FilterCars database error: {err}")
+        return []
+
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
     
 
 #TODO update/cars
