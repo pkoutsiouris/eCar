@@ -179,7 +179,6 @@ def main():
             
     except Exception as e:
         print(f"Σφάλμα κατά την εκτέλεση του GetUserReservations test: {e}")
-        """
 
     # Test: Change password
     try:
@@ -203,6 +202,14 @@ def main():
 
         functions.ChangePassword(test_user, new_secret_password)
 
+    except Exception as e:
+        print(f"Σφάλμα κατά την εκτέλεση του τεστ στη main: {e}")
+        """
+    
+    # Test: Show reservations
+    try:
+        print(f"Προσπάθεια εμφάνισης κρατήσεων:")
+        print(functions.ShowReservations())
     except Exception as e:
         print(f"Σφάλμα κατά την εκτέλεση του τεστ στη main: {e}")
 

@@ -39,3 +39,7 @@ license_type varchar(3));
  reservation_status varchar(21) not null,
  FOREIGN KEY (Car_ID) REFERENCES cars(Car_ID) ON DELETE RESTRICT,
  FOREIGN KEY (User_ID) REFERENCES users(User_ID) ON DELETE CASCADE);
+ 
+INSERT INTO cars (brand, model, production_year, license_plate, seats, price) VALUES
+('Toyota', 'Yaris', 2020, 'ABC1234', 5, 45.0),
+('Honda', 'Civic', 2021, 'XYZ9876', 5, 55.0);
