@@ -236,9 +236,17 @@ class LoginWindow(QWidget):
         response,message,role = auth.authenticate_user(email, password)
         print(response)
         if response:
-            self.user_window = MainDashboard(email)
-            self.user_window.show()
-            self.close()
+            if role == "Admin":
+                from admin_page import AdminWindow
+                self.user_window = AdminWindow(email)
+                self.user_window.show()
+                self.close()
+            #else if role == "Dealer" :
+             #   self.user_window = DealerWindow(email)
+            else:
+                self.user_window = MainDashboard(email)
+                self.user_window.show()
+                self.close()
         else:
             QMessageBox.warning(self, "Login Failed!", message)
             
