@@ -513,7 +513,40 @@ class MainDashboard(QMainWindow):
                     col = 0
                     row += 1
         
+    def apply_sort(self):
+        selected_sort = self.sort_combo.currentText()
 
+        if not selected_sort:
+            return
+
+        if selected_sort == "Price: Low to High":
+            sorted_cars = functions.GetSortedCars("price", descending=False)
+
+        elif selected_sort == "Price: High to Low":
+            sorted_cars = functions.GetSortedCars("price", descending=True)
+
+        elif selected_sort == "Year: Newest First":
+            sorted_cars = functions.GetSortedCars("year", descending=True)
+
+        elif selected_sort == "Year: Oldest First":
+            sorted_cars = functions.GetSortedCars("year", descending=False)
+
+        elif selected_sort == "CC: Low to High":
+            sorted_cars = functions.GetSortedCars("cc", descending=False)
+
+        elif selected_sort == "CC: High to Low":
+            sorted_cars = functions.GetSortedCars("cc", descending=True)
+
+        else:
+            return
+
+        if isinstance(sorted_cars, list):
+            self.update_grid(sorted_cars)
+            self.right_info_label.setText(f"Showing <b>{len(sorted_cars)}</b> vehicles")
+        else:
+            print(f"functions.py did not return a list: {sorted_cars}")
+            self.update_grid([])
+            self.right_info_label.setText("Showing <b>0</b> vehicles")    
             
  
     def open_filters(self):
