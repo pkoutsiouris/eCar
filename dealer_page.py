@@ -58,6 +58,7 @@ class DealerWindow(QMainWindow):
         logo = QLabel("Dealer Portal")
         logo.setStyleSheet("color: white; font-size: 22px; font-weight: 800; padding: 20px;")
         sidebar_layout.addWidget(logo)
+        
 
         self.nav_group = QButtonGroup(self)
         self.btn_dash = self.make_nav_btn("View Dashboard", True)
@@ -70,6 +71,27 @@ class DealerWindow(QMainWindow):
         sidebar_layout.addStretch()
         shell_layout.addWidget(sidebar)
 
+        btn_logout = QPushButton("Logout")
+        btn_logout.setCursor(Qt.PointingHandCursor)
+        btn_logout.setMinimumHeight(46)
+        btn_logout.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 14px 22px;
+                border: none;
+                font-size: 14px;
+                font-weight: 700;
+                color: #f87171;
+                background: transparent;
+                border-left: 4px solid transparent;
+            }
+            QPushButton:hover {
+                background-color: #3d2424;
+                color: #ff4444;
+            }
+        """)
+        btn_logout.clicked.connect(self.logout)
+        sidebar_layout.addWidget(btn_logout)
         # Content Area
         self.pages = QStackedWidget()
         shell_layout.addWidget(self.pages)
@@ -401,6 +423,12 @@ class DealerWindow(QMainWindow):
                     QMessageBox.warning(self, "Error", "Could not delete vehicle. It might be linked to a reservation.")
             else:
                 QMessageBox.critical(self, "System Error", "Function 'DeleteCar' not found in back_end.functions")
+
+    def logout(self):
+        from login import LoginWindow
+        self.login_win = LoginWindow()
+        self.login_win.show()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
