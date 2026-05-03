@@ -1,9 +1,11 @@
 import sys
+import os
+import shutil
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QFrame, QTableWidget, QTableWidgetItem, 
     QHeaderView, QStackedWidget, QButtonGroup, QMessageBox, 
-    QLineEdit, QFormLayout, QComboBox, QSpinBox, QDoubleSpinBox, QScrollArea, QFileDialog 
+    QLineEdit, QFormLayout, QComboBox, QSpinBox, QDoubleSpinBox, QScrollArea, QFileDialog, QGridLayout
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
@@ -121,61 +123,119 @@ class DealerWindow(QMainWindow):
     def create_car_page(self):
         page = QScrollArea()
         container = QWidget()
-        main_v_layout = QVBoxLayout(container) # Κύριο κάθετο layout
-        form_layout = QFormLayout()
-        container.setStyleSheet("color: black; padding: 10px; background: white;")
-        main_v_layout.setContentsMargins(10, 10, 10, 10)
-        main_v_layout.setSpacing(5)
+        container.setStyleSheet("background-color: white; color: #1e293b;")
         
-        # Πεδία βάσει του InitDB.sql και του constructor της κλάσης Car[cite: 2, 4]
-        self.f_brand = QLineEdit()
-        self.f_model = QLineEdit()
-        self.f_year = QSpinBox(); self.f_year.setRange(2000, 2026)
+        # Κύριο Layout με ελεγχόμενα margins
+        main_layout = QVBoxLayout(container)
+        main_layout.setContentsMargins(30, 20, 30, 20)
+        main_layout.setSpacing(15)
+
+        # Grid Layout για τα πεδία εισαγωγής
+        grid = QGridLayout()
+        grid.setSpacing(12) # Spacing ανάμεσα στα κουτάκια
+        grid.setColumnStretch(1, 1) # Δίνει χώρο στα input fields
+        grid.setColumnStretch(3, 1)
+
+        # Στυλ για τα Inputs
+        # Καθαρό στυλ χωρίς gradients για τα inputs
+        input_style = """
+            QWidget#CarContainer {
+                background-color: #f1f5f9; /* Ελαφρύ γκρι φόντο για όλη τη σελίδα */
+            }
+            QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+                padding: 8px;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                background-color: white; /* Σταθερό λευκό χρώμα */
+                color: #1e293b;
+                selection-background-color: #3b82f6;
+            }
+            QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {
+                border: 2px solid #3b82f6;
+                background-color: #ffffff;
+            }
+            QLabel {
+                font-weight: 700;
+                color: #334155;
+                background: transparent; /* Σημαντικό για να μην παίρνει το gradient */
+            }
+        """
+        container.setObjectName("CarContainer")
+        container.setStyleSheet(input_style)
+
+        # Ορισμός Πεδίων
+        self.f_brand = QLineEdit(); self.f_model = QLineEdit()
+        self.f_year = QSpinBox(); self.f_year.setRange(2000, 2026); self.f_year.setFixedWidth(100)
         self.f_plate = QLineEdit()
         self.f_seats = QSpinBox(); self.f_seats.setRange(1, 9)
         self.f_doors = QSpinBox(); self.f_doors.setRange(2, 5)
         self.f_cc = QSpinBox(); self.f_cc.setRange(500, 8000)
-        self.f_state = QComboBox(); self.f_state.addItems(['Available', 'In_Service', 'Unavailable'])
-        self.f_desc = QLineEdit()
+        self.f_hp = QSpinBox(); self.f_hp.setRange(50, 1500)
         self.f_fuel = QComboBox(); self.f_fuel.addItems(['Gas', 'Diesel', 'Hybrid', 'Electric'])
         self.f_trans = QComboBox(); self.f_trans.addItems(['Manual', 'Auto'])
-        self.f_hp = QSpinBox(); self.f_hp.setRange(50, 1500)
-        self.f_price = QDoubleSpinBox(); self.f_price.setRange(0, 5000)
-        self.image_path_display = QLineEdit()
-        self.image_path_display.setReadOnly(True)
-        self.image_path_display.setPlaceholderText("No image selected")
+        self.f_state = QComboBox(); self.f_state.addItems(['Available', 'In_Service', 'Unavailable'])
+        self.f_price = QDoubleSpinBox(); self.f_price.setRange(0, 5000); self.f_price.setSuffix(" €")
+        self.f_desc = QLineEdit(); self.f_desc.setPlaceholderText("Short vehicle description...")
+
+        # Τοποθέτηση στο Grid (Row, Col)
+        # Γραμμή 0
+        grid.addWidget(QLabel("Brand:"), 0, 0); grid.addWidget(self.f_brand, 0, 1)
+        grid.addWidget(QLabel("Model:"), 0, 2); grid.addWidget(self.f_model, 0, 3)
         
-        btn_import_img = QPushButton("Select Car Photo")
-        btn_import_img.setStyleSheet("background: #64748b; color: white; padding: 5px;")
+        # Γραμμή 1
+        grid.addWidget(QLabel("Year:"), 1, 0); grid.addWidget(self.f_year, 1, 1)
+        grid.addWidget(QLabel("License Plate:"), 1, 2); grid.addWidget(self.f_plate, 1, 3)
+
+        # Γραμμή 2
+        grid.addWidget(QLabel("Seats:"), 2, 0); grid.addWidget(self.f_seats, 2, 1)
+        grid.addWidget(QLabel("Doors:"), 2, 2); grid.addWidget(self.f_doors, 2, 3)
+
+        # Γραμμή 3
+        grid.addWidget(QLabel("Engine CC:"), 3, 0); grid.addWidget(self.f_cc, 3, 1)
+        grid.addWidget(QLabel("Horsepower:"), 3, 2); grid.addWidget(self.f_hp, 3, 3)
+
+        # Γραμμή 4
+        grid.addWidget(QLabel("Fuel Type:"), 4, 0); grid.addWidget(self.f_fuel, 4, 1)
+        grid.addWidget(QLabel("Transmission:"), 4, 2); grid.addWidget(self.f_trans, 4, 3)
+
+        # Γραμμή 5
+        grid.addWidget(QLabel("Status:"), 5, 0); grid.addWidget(self.f_state, 5, 1)
+        grid.addWidget(QLabel("Price / Day:"), 5, 2); grid.addWidget(self.f_price, 5, 3)
+
+        main_layout.addLayout(grid)
+
+        # Description (Full Width)
+        main_layout.addWidget(QLabel("Description:"))
+        main_layout.addWidget(self.f_desc)
+
+        # Image Selection Section
+        img_group = QHBoxLayout()
+        self.image_path_display = QLineEdit(); self.image_path_display.setReadOnly(True)
+        btn_import_img = QPushButton("Select Photo")
+        btn_import_img.setStyleSheet("background: #64748b; color: white; padding: 7px 15px; font-weight: bold;")
         btn_import_img.clicked.connect(self.import_image)
-        
-        img_layout = QHBoxLayout()
-        img_layout.addWidget(self.image_path_display)
-        img_layout.addWidget(btn_import_img)
+        img_group.addWidget(self.image_path_display)
+        img_group.addWidget(btn_import_img)
+        main_layout.addLayout(img_group)
 
-        layout.addRow("Brand:", self.f_brand)
-        layout.addRow("Model:", self.f_model)
-        layout.addRow("Year:", self.f_year)
-        layout.addRow("License Plate:", self.f_plate)
-        layout.addRow("Seats:", self.f_seats)
-        layout.addRow("Doors:", self.f_doors)
-        layout.addRow("CC:", self.f_cc)
-        layout.addRow("State:", self.f_state)
-        layout.addRow("Description:", self.f_desc)
-        layout.addRow("Fuel Type:", self.f_fuel)
-        layout.addRow("Transmission:", self.f_trans)
-        layout.addRow("Horsepower:", self.f_hp)
-        layout.addRow("Price per Day:", self.f_price)
-        layout.addRow("Car Image:", img_layout)
-
-        btn_submit = QPushButton("Add Vehicle to Database")
-        btn_submit.setStyleSheet("background: #3b82f6; color: white; padding: 12px; font-weight: bold;")
+        # Submit Button
+        main_layout.addSpacing(10)
+        btn_submit = QPushButton("Add Vehicle to Fleet")
+        btn_submit.setCursor(Qt.PointingHandCursor)
+        btn_submit.setStyleSheet("""
+            QPushButton {
+                background: #3b82f6; color: white; padding: 12px; 
+                font-size: 15px; font-weight: bold; border-radius: 6px;
+            }
+            QPushButton:hover { background: #2563eb; }
+        """)
         btn_submit.clicked.connect(self.submit_car)
-        layout.addRow(btn_submit)
+        main_layout.addWidget(btn_submit)
+        
+        main_layout.addStretch() # Σπρώχνει τα πάντα προς τα πάνω για να μην "αιωρούνται"
 
         page.setWidget(container)
         page.setWidgetResizable(True)
-        
         return page
     def import_image(self):
         file_dialog = QFileDialog(self)
@@ -188,14 +248,42 @@ class DealerWindow(QMainWindow):
         if file_path:
             self.image_path_display.setText(file_path)
     def submit_car(self):
-        selected_img = self.image_path_display.text()
-        final_img_path = selected_img if selected_img != "" else self.f_plate.text()
-        # Δημιουργία instance Car από τα inputs
+        selected_img_path = self.image_path_display.text()
+        plate_text = self.f_plate.text().strip()
+
+        # Έλεγχος αν έχει συμπληρωθεί η πινακίδα (απαραίτητο για το όνομα της εικόνας)
+        if not plate_text:
+            QMessageBox.warning(self, "Input Error", "Please enter a License Plate first.")
+            return
+
+        final_img_name = f"{plate_text}.png"
+        
+        # Διαχείριση Φακέλου και Αντιγραφή Εικόνας
+        if selected_img_path and os.path.exists(selected_img_path):
+            try:
+                # Δημιουργία φακέλου imgs αν δεν υπάρχει
+                dest_folder = "imgs"
+                if not os.path.exists(dest_folder):
+                    os.makedirs(dest_folder)
+                
+                # Ορισμός τελικής διαδρομής: imgs/ΠΙΝΑΚΙΔΑ.png
+                dest_path = os.path.join(dest_folder, final_img_name)
+                
+                # Αντιγραφή του αρχείου στον φάκελο imgs
+                shutil.copy2(selected_img_path, dest_path)
+            except Exception as e:
+                QMessageBox.critical(self, "File Error", f"Could not save image: {str(e)}")
+                return
+        else:
+            # Αν δεν επιλέχθηκε εικόνα, ορίζουμε μια default τιμή ή αφήνουμε κενό
+            final_img_name = "default.png"
+
+        # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
         new_car = classes.Car(
             brand=self.f_brand.text(),
             model=self.f_model.text(),
             prod_year=self.f_year.value(),
-            plate=self.f_plate.text(),
+            plate=plate_text,
             seats=self.f_seats.value(),
             doors=self.f_doors.value(),
             cc=self.f_cc.value(),
@@ -204,13 +292,13 @@ class DealerWindow(QMainWindow):
             fuel=self.f_fuel.currentText(),
             trans=self.f_trans.currentText(),
             horsepower=self.f_hp.value(),
-            imgPath=self.f_plate.text(), # Χρησιμοποιείται η πινακίδα ως path
+            imgPath=final_img_name, # Αποθηκεύουμε μόνο το όνομα (π.χ. ABC-1234.png)
             price=self.f_price.value(),
             availability=True
         )
         
         if functions.CreateCar(new_car): 
-            QMessageBox.information(self, "Success", "Vehicle registered successfully.")
+            QMessageBox.information(self, "Success", f"Vehicle and image {final_img_name} registered successfully.")
             self.image_path_display.clear() 
             self.show_dashboard()
         else:
