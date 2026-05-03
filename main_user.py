@@ -1,9 +1,10 @@
 import sys
+import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox, 
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from back_end import functions
 from datetime import datetime
 from reservation_page import ReservationsWindow
@@ -13,35 +14,44 @@ class FilterDialog(QDialog):
     def __init__(self, parent=None): 
         super().__init__(parent)
         self.setWindowTitle("Filter")
+
         layout = QVBoxLayout(self)
 
         form = QFormLayout()
+
         self.price_input = QLineEdit()
         self.year_input = QLineEdit()
         self.cc_input = QLineEdit()
         self.hp_input = QLineEdit()
-        
+
+        self.price_input.setPlaceholderText("e.g. 50")
+        self.year_input.setPlaceholderText("e.g. 2020")
+        self.cc_input.setPlaceholderText("e.g. 1400")
+        self.hp_input.setPlaceholderText("e.g. 100")
+
         form.addRow("Max Price (€):", self.price_input)
         form.addRow("Min Year:", self.year_input)
         form.addRow("Min CC:", self.cc_input)
         form.addRow("Min HP:", self.hp_input)
+
         layout.addLayout(form)
-        
+
         btn = QPushButton("Apply")
         btn.clicked.connect(self.accept)
         layout.addWidget(btn)
-        def get_values(self):
-            p = self.price_input.text().strip()
-            y = self.year_input.text().strip()
-            cc = self.cc_input.text().strip()
-            hp = self.hp_input.text().strip()
 
-            return (
-                float(p) if p else None,
-                int(y) if y else None,
-                int(cc) if cc else None,
-                int(hp) if hp else None
-            )
+    def get_values(self):
+        p = self.price_input.text().strip()
+        y = self.year_input.text().strip()
+        cc = self.cc_input.text().strip()
+        hp = self.hp_input.text().strip()
+
+        return (
+            float(p) if p else None,
+            int(y) if y else None,
+            int(cc) if cc else None,
+            int(hp) if hp else None
+        )
 class RentDetails(QDialog):
     def __init__(self, total_price, parent=None): 
         super().__init__(parent)
@@ -501,7 +511,7 @@ class MainDashboard(QMainWindow):
                 
                 self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
 
-
+# ALAGH AVAILABILITY
         row = 0
         col = 0
         for car in cars_list:
@@ -551,6 +561,7 @@ class MainDashboard(QMainWindow):
  
     def open_filters(self):
         dialog = FilterDialog(self)
+
         if dialog.exec():
             try:
                 price, year, cc, hp = dialog.get_values()
@@ -560,13 +571,15 @@ class MainDashboard(QMainWindow):
                 else:
                     filtered = functions.FilterCars(price, year, cc, hp)
                 
-                if isinstance(filtered, list): # elegxos an oti hr8e apo thn DB einai sthn List
+                if isinstance(filtered, list):
                     self.update_grid(filtered)
                 else:
                     print(f"functions.py den esteile thn lista {filtered}")
-                    self.update_grid([]) # an den esteile lista, emfanise keno
+                    self.update_grid([])
+
             except ValueError:
                 print("Error please enter only numbers!")
+
     def logout(self):
         from login import LoginWindow
         self.login_window = LoginWindow() 
@@ -773,11 +786,23 @@ class MainDashboard(QMainWindow):
             self.password_status_label.setStyleSheet("color: #dc2626; font-size: 13px; font-weight: 600; background: transparent; border: none;")
     
     def reservations(self):  
-        
         self.stacked_widget.setCurrentIndex(1)
+
     def show_dashboard(self):
-        
+        self.refresh_dashboard()
         self.stacked_widget.setCurrentIndex(0)
+      
+    
+
+
+
+
+    def refresh_dashboard(self):
+        self.cars = functions.GetCars() or []
+        self.update_grid(self.cars)
+        available_count = sum(1 for car in self.cars if car["state"] == "Available")
+        self.right_info_label.setText(f"Showing <b>{available_count}</b> vehicles")
+    
     def make_sidebar_button(self, text, checked=False):
         btn = QPushButton(text)
         btn.setCheckable(True)
@@ -923,8 +948,18 @@ class MainDashboard(QMainWindow):
         car_image.setAlignment(Qt.AlignCenter)
         car_image.setStyleSheet("background: transparent; border: none;")
 
-        img_path = car["image_path"].lstrip("/")
-        pixmap = QPixmap(img_path)
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        print("BASE_DIR IS ", BASE_DIR)
+        
+        # 1. Add the .png extension to the car's image name
+        filename = f"{car['image_path']}.png"
+
+        # 2. Join BASE_DIR, the "imgs" folder, and the filename all together
+        full_path = os.path.join(BASE_DIR, "imgs", filename)
+
+        print(full_path)
+        pixmap = QPixmap(full_path)
     
         if not pixmap.isNull():
             scaled_pixmap = pixmap.scaled(

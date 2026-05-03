@@ -60,33 +60,59 @@ class AdminWindow(QMainWindow):
         """)
         
         sidebar_layout = QVBoxLayout(sidebar)
-        sidebar_layout.setContentsMargins(0, 22, 0, 18)
+        sidebar_layout.setContentsMargins(0, 24, 0, 18)
+        sidebar_layout.setSpacing(6)
+
         
         logo = QLabel("Admin Panel")
-        logo.setStyleSheet("color: white; font-size: 22px; font-weight: 800; padding: 0 20px 20px 20px;")
+        logo.setStyleSheet("""
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            padding-left: 22px;
+            padding-bottom: 18px;
+            background: transparent;
+        """)
         sidebar_layout.addWidget(logo)
 
         self.nav_group = QButtonGroup(self)
         self.nav_group.setExclusive(True)
 
         # Buttons
-        self.btn_dash = self.make_nav_btn("Dashboard", True)
-        self.btn_users = self.make_nav_btn("Manage Users")
+
+        self.btn_users = self.make_nav_btn("Manage Users", True)
         self.btn_logs = self.make_nav_btn("System Logs")
         
-        self.btn_dash.clicked.connect(lambda: self.pages.setCurrentIndex(0))
-        self.btn_users.clicked.connect(lambda: self.pages.setCurrentIndex(1))
-        self.btn_logs.clicked.connect(lambda: self.pages.setCurrentIndex(2))
+        self.btn_users.clicked.connect(lambda: self.pages.setCurrentIndex(0))
+        self.btn_logs.clicked.connect(lambda: self.pages.setCurrentIndex(1))
 
-        sidebar_layout.addWidget(self.btn_dash)
+
         sidebar_layout.addWidget(self.btn_users)
         sidebar_layout.addWidget(self.btn_logs)
         sidebar_layout.addStretch()
-
         btn_logout = QPushButton("Logout")
-        btn_logout.setStyleSheet("color: #f87171; font-weight: bold;")
+        btn_logout.setCursor(Qt.PointingHandCursor)
+        btn_logout.setMinimumHeight(46)
+        btn_logout.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 14px 22px;
+                border: none;
+                font-size: 14px;
+                font-weight: 700;
+                color: #f87171;
+                background: transparent;
+                border-left: 4px solid transparent;
+            }
+            QPushButton:hover {
+                background-color: #3d2424;
+                color: #ff4444;
+            }
+        """)
         btn_logout.clicked.connect(self.logout)
         sidebar_layout.addWidget(btn_logout)
+
+        
 
         shell_layout.addWidget(sidebar)
 
@@ -96,8 +122,6 @@ class AdminWindow(QMainWindow):
         self.pages = QStackedWidget()
         shell_layout.addWidget(self.pages)
 
-        # PAGE 0: DASHBOARD (Σύνδεση με MainDashboard)
-        self.pages.addWidget(self.create_welcome_page())
 
         # PAGE 1: MANAGE USERS
         self.pages.addWidget(self.create_users_page())
@@ -110,6 +134,8 @@ class AdminWindow(QMainWindow):
         btn.setCheckable(True)
         btn.setChecked(checked)
         btn.setCursor(Qt.PointingHandCursor)
+        btn.setMinimumHeight(46)
+
         self.nav_group.addButton(btn)
         return btn
 
@@ -131,38 +157,7 @@ class AdminWindow(QMainWindow):
         layout.addSpacing(20)
         return banner
 
-    def create_welcome_page(self):
-        page = QWidget()
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(0,0,0,0)
-        layout.addWidget(self.create_banner("Admin Dashboard", f"Welcome back, {self.session_email}"))
-        
-        content = QVBoxLayout()
-        content.setContentsMargins(30,30,30,30)
-        
-        info_card = QFrame()
-        info_card.setStyleSheet("background: white; border-radius: 15px; border: 1px solid #e2e8f0;")
-        card_layout = QVBoxLayout(info_card)
-        
-        msg = QLabel("Select a category from the sidebar to manage the system.")
-        msg.setStyleSheet("color: #475569; font-size: 16px;")
-        msg.setAlignment(Qt.AlignCenter)
-        
-        btn_back = QPushButton("Go to User Dashboard")
-        btn_back.setFixedWidth(200)
-        btn_back.setStyleSheet("background: #38bdf8; color: white; padding: 10px; border-radius: 8px; font-weight: bold;")
-        btn_back.clicked.connect(self.forward_to_dashboard)
-        
-        card_layout.addSpacing(40)
-        card_layout.addWidget(msg)
-        card_layout.addSpacing(20)
-        card_layout.addWidget(btn_back, alignment=Qt.AlignCenter)
-        card_layout.addSpacing(40)
-        
-        content.addWidget(info_card)
-        content.addStretch()
-        layout.addLayout(content)
-        return page
+    
     
     def create_users_page(self):
         page = QWidget()
@@ -333,12 +328,6 @@ class AdminWindow(QMainWindow):
         from login import LoginWindow
         self.login_win = LoginWindow()
         self.login_win.show()
-        self.close()
-
-    def forward_to_dashboard(self):
-        from main_user import MainDashboard
-        self.main_dash = MainDashboard(self.session_email)
-        self.main_dash.show()
         self.close()
 
 if __name__ == "__main__":
