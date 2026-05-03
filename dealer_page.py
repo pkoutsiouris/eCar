@@ -18,6 +18,7 @@ class DealerWindow(QMainWindow):
         super().__init__()
         self.session_email = session_email
         self.setWindowTitle("eCar Rental - Dealer Panel")
+        self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 850)
 
         outer = QWidget()
