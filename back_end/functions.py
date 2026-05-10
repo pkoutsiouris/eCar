@@ -47,7 +47,7 @@ def ConnectDB():
         return conn,cursor
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")
-        WriteErrorLog("ConnectDB",err)
+        WriteErrorLog("ConnectDB",str(err))
         return None
     
 def CheckCarExists(car: classes.Car):
@@ -62,7 +62,7 @@ def CheckCarExists(car: classes.Car):
             return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση (checkcarexists): {err}")
-        WriteErrorLog("CheckCarExists",err)
+        WriteErrorLog("CheckCarExists",str(err))
         return None
     finally:
         db.close()
@@ -78,7 +78,7 @@ def GetCars():
         return car
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση from getcars: {err}")
-        WriteErrorLog("GetCars",err)
+        WriteErrorLog("GetCars",str(err))
         return None
     finally:
         db.close()
@@ -105,7 +105,7 @@ def CreateCar(car: classes.Car):
         return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")  
-        WriteErrorLog("CreateCar",err) 
+        WriteErrorLog("CreateCar",str(err)) 
         return False
     finally:
         db.close()
@@ -120,7 +120,7 @@ def GetUsers():
         return users
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά την ανάκτηση χρηστών (GetUsers): {err}")
-        WriteErrorLog("GetUsers",err) 
+        WriteErrorLog("GetUsers",str(err))
         return None
     finally:
         db.close()
@@ -158,7 +158,7 @@ def FilterCars(price: float, year: int, cc: int, horses: int):
 
     except mysql.connector.Error as err:
         print(f"FilterCars database error: {err}")
-        WriteErrorLog("FilterCars",err)
+        WriteErrorLog("FilterCars",str(err))
         return []
 
     finally:
@@ -182,7 +182,7 @@ def CheckUserExists(user: classes.User):
             return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
-        WriteErrorLog("CheckUserExists",err)
+        WriteErrorLog("CheckUserExists",str(err))
         return None
     finally:
         db.close()
@@ -207,7 +207,7 @@ def RegisterUser(user: classes.User):
         return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
-        WriteErrorLog("RegisterUser",err)
+        WriteErrorLog("RegisterUser",str(err))
         return False
     finally:
         db.close()
@@ -235,11 +235,14 @@ def GiveDealerAccess(email: str):#TODO ADD FROM HERE ON OUT WriteErrorLog and Wr
         db.execute(update_query, (email,))
         conn.commit()
         
+        msg = f"User {email} changed role to Dealer"
+        WriteLog("GiveDealerAccess", msg)
         print(f"Επιτυχία! Ο χρήστης {email} είναι πλέον Dealer.")
         return True
         
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά την αλλαγή σε Dealer: {err}")
+        WriteErrorLog("GiveDealerAccess", str(err))
         return False
     finally:
         if 'db' in locals() and db is not None:
@@ -271,11 +274,14 @@ def GiveAdminAccess(email: str):
         db.execute(update_query, (email,))
         conn.commit()
         
+        msg = f"User {email} changed role to Admin"
+        WriteLog("GiveAdminAccess", msg)
         print(f"Επιτυχία! Ο χρήστης {email} αναβαθμίστηκε σε Admin.")
         return True
         
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά την αναβάθμιση σε Admin: {err}")
+        WriteErrorLog("GiveAdminAccess", str(err))
         return False
     finally:
         if 'db' in locals() and db is not None:
@@ -293,8 +299,12 @@ def DeleteCar(car: classes.Car):
         query = "delete from cars where car_id=%s"
         db.execute(query,(car.car_id))
         conn.commit()
+        msg = f"Deleted car with id: {car.car_id}"
+        WriteLog("DeleteCar", msg)
+        return True
     except Exception as err:
-        print("Σφάλμα κατά τη διαγραφή: {err}")   
+        print("Σφάλμα κατά τη διαγραφή: {err}")
+        WriteErrorLog("DeleteCar", str(err))
         return False
     finally:
         db.close()
@@ -324,6 +334,7 @@ def GetSortedCars(sort_by: str, descending: bool = False):
     
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά την ταξινόμηση (GetSortedCars): {err}")
+        WriteErrorLog("GetSortedCars", str(err))
         return None
     finally:
         if 'db' in locals() and db is not None:
@@ -339,6 +350,7 @@ def GetUserSession(email:str):
         return user
     except mysql.connector.Error as err:
         print(f"Could not find users: {err}")
+        WriteErrorLog("GetUserSession", str(err))
         return None
     finally:
         db.close()
@@ -354,6 +366,7 @@ def GetCarByLicense(license:str):
         return car
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
+        WriteErrorLog("GetCarByLicense", str(err))
         return None
     finally:
         db.close()
@@ -369,6 +382,7 @@ def GetCarbyID(ID:str):
         return car
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
+        WriteErrorLog("GetCarbyID", str(err))
         return None
     finally:
         db.close()
@@ -401,10 +415,13 @@ def CreateReservation(email:str,start_date, end_date,car_id):
         query = "UPDATE cars SET availability=0 , state='Unavailable' WHERE car_id=%s"
         db.execute(query,(car_id,))
         conn.commit()
-
+        msg = f"Created reservation for user {email}, car_id {car_id}, from {start_date} to {end_date}"
+        WriteLog("CreateReservation", msg)
         return True
+    
     except mysql.connector.Error as err:
         print(f"Could not find users: {err}")
+        WriteErrorLog("CreateReservation", str(err))
         return None
     finally:
         db.close()
@@ -420,6 +437,7 @@ def GetUserReservations(email:str):
         return reservation
     except mysql.connector.Error as err:
         print(f"Error getting car by license plate: {err}")
+        WriteErrorLog("GetUserReservations", str(err))
         return None
     finally:
         db.close()
@@ -430,9 +448,12 @@ def UpdateUserRole(email: str, new_role: str):
         query = "UPDATE users SET user_role = %s WHERE email = %s"
         db.execute(query, (new_role, email))
         conn.commit()
+        msg = f"Updated role for {email} to {new_role}"
+        WriteLog("UpdateUserRole", msg)
         return True
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά την αλλαγή ρόλου: {err}")
+        WriteErrorLog("UpdateUserRole", str(err))
         return False
     finally:
         db.close()
@@ -447,6 +468,8 @@ def DeleteUserByEmail(email: str):
         
         # Ελέγχουμε αν όντως διαγράφηκε κάποια γραμμή
         if db.rowcount > 0:
+            msg = f"Deleted user with email: {email}"
+            WriteLog("DeleteUserByEmail", msg)
             print(f"User {email} deleted successfully from database.")
             return True
         else:
@@ -454,6 +477,7 @@ def DeleteUserByEmail(email: str):
             return False
     except mysql.connector.Error as err:
         print(f"Σφάλμα κατά τη διαγραφή χρήστη: {err}")
+        WriteErrorLog("DeleteUserByEmail", str(err))
         return False
     finally:
         db.close()
@@ -487,11 +511,13 @@ def ChangePassword(email: str, old_password: str, new_password: str):
         update_query = "UPDATE users SET user_password = %s WHERE email = %s"
         db.execute(update_query, (new_password, email))
         conn.commit()
-
+        msg = f"Changed password for user: {email}"
+        WriteLog("ChangePassword", msg)
         return True, "Password changed successfully."
 
     except Exception as e:
         print(f"Error during password update: {e}")
+        WriteErrorLog("ChangePassword", str(e))
         return False, "Error while changing password."
 
     finally:
@@ -522,13 +548,15 @@ def DeleteReservation(reservation_id: int):
         query = "UPDATE cars SET availability=1 , state='Available' WHERE car_id=%s"
         db.execute(query,(res['car_id'],))
         conn.commit()
-
+        msg = f"Deleted reservation {reservation_id} and made car {res['car_id']} available again"
+        WriteLog("DeleteReservation", msg)
 
         print(f"The reservation with ID {reservation_id} deleted.")
         return True
 
     except mysql.connector.Error as err:
         print(f"Error: reservation was not deleted {err}")   
+        WriteErrorLog("DeleteReservation", str(err))
         return False
     finally:
         if 'db' in locals() and db is not None:
@@ -549,11 +577,11 @@ def GetReservedCarsByUser(user_email):
 
         db.execute(query, (user['user_id'],))
         cars = db.fetchall()
-
         return cars
 
     except mysql.connector.Error as err:
         print(f"Error getting user's reserved cars: {err}")
+        WriteErrorLog("GetReservedCarsByUser", str(err))
         return None
 
     finally:
@@ -570,6 +598,7 @@ def GetReservationByCarID(car_id: int, user_email):
         return reservation
     except mysql.connector.Error as err:
         print(f"Error getting reservation by car and user ID: {err}")
+        WriteErrorLog("GetReservationByCarID", str(err))
         return None
     finally:
         db.close()
@@ -586,6 +615,7 @@ def ShowReservations():
 
     except Exception as e:
         print(f"Error: {e}")   
+        WriteErrorLog("ShowReservations", str(e))
         return False
     
     finally:
@@ -593,33 +623,3 @@ def ShowReservations():
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
-
-def GetAvailableCars(start, end ):
-
-    try:
-        conn,db = ConnectDB()
-        st = datetime.strptime(start, "%Y-%m-%d %H:%M")
-        et = datetime.strptime(end, "%Y-%m-%d %H:%M")
-        query = """
-        SELECT *
-        FROM cars c
-        WHERE c.availability = TRUE
-        AND c.state = 'Available'
-        AND c.car_id NOT IN (
-            SELECT r.car_id
-            FROM reservations r
-            WHERE r.reservation_status != 'Cancelled'
-                AND r.start_date < %s
-                AND r.end_date > %s
-        );
-        """
-        db.execute(query, (et,st))
-        cars = db.fetchall()
-        return cars
-    except mysql.connector.Error as err:
-        print(f"Error getting user's reserved cars: {err}")
-        return None
-
-    finally:
-        db.close()
-        conn.close()
