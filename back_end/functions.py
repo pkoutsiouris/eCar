@@ -4,6 +4,8 @@ import os
 #import classes
 from back_end import classes
 from back_end.session import session
+from back_end import authentication
+
 def WriteErrorLog(funcname: str, err: str):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     full_path = os.path.join(BASE_DIR, "..", "logs", "errlogs.txt")
@@ -189,12 +191,16 @@ def CheckUserExists(user: classes.User):
         conn.close()
 
 def RegisterUser(user: classes.User):
+    if not authentication.is_valid_email(user.email):
+        print(f"You need a valid email.")
+        return False
+    
     try:
         conn,db = ConnectDB()
         if CheckUserExists(user):
             print("User already exists with email: " + user.email)  
             return False
-        
+
         query=" INSERT INTO users (username, user_password, " \
         "user_role, first_name, surname, email, phone_number, " \
         "license_number, license_type) VALUES (" \
@@ -205,13 +211,16 @@ def RegisterUser(user: classes.User):
         msg="Registered user with email: " + str(user.email)
         WriteLog("RegisterUser",msg)
         return True
+    
     except mysql.connector.Error as err:
         print(f"Σφάλμα σύνδεσης με τη βάση: {err}")   
         WriteErrorLog("RegisterUser",str(err))
         return False
     finally:
-        db.close()
-        conn.close()
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def GiveDealerAccess(email: str):#TODO ADD FROM HERE ON OUT WriteErrorLog and WriteLog
     try:

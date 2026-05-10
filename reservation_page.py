@@ -1,4 +1,5 @@
 import sys
+import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QDateTimeEdit, QDialogButtonBox
@@ -208,35 +209,28 @@ class ReservationsWindow(QWidget):
             widget = self.grid.itemAt(i).widget()
             if widget:
                 widget.deleteLater()
-                
-        if not cars_list:           
-                no_cars_label = QLabel("No reservations can be found.")
-                no_cars_label.setAlignment(Qt.AlignCenter)
-                no_cars_label.setStyleSheet("""
-                    color: #8a94a6; 
-                    font-size: 20px; 
-                    font-weight: bold; 
-                    margin-top: 60px;
-                """)
-                
-                self.grid.addWidget(no_cars_label, 0, 0, 1, 3) 
-                
-                self.right_info_label.setText("Showing <b>0</b> vehicles")
-                
-                return 
-                
-                self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
 
+        if not cars_list:
+            no_cars_label = QLabel("No reservations can be found.")
+            no_cars_label.setAlignment(Qt.AlignCenter)
+            no_cars_label.setStyleSheet("""
+                color: #8a94a6;
+                font-size: 20px;
+                font-weight: bold;
+                margin-top: 60px;
+            """)
+
+            self.grid.addWidget(no_cars_label, 0, 0, 1, 3)
+            self.right_info_label.setText("Showing <b>0</b> reservations")
+            return
+
+        self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> reservations")
 
         row = 0
-        col = 0
         for car in cars_list:
             card = self.create_car_card(car)
-            self.grid.addWidget(card, row, col)
-            col += 1
-            if col > 2:
-                col = 0
-                row += 1
+            self.grid.addWidget(card, row, 0, alignment=Qt.AlignTop | Qt.AlignHCenter)
+            row += 1
         
           
     def logout(self):
@@ -286,9 +280,10 @@ class ReservationsWindow(QWidget):
 
     def create_car_card(self, car):
         card = QFrame()
-        card.setMinimumHeight(360)
-        card.setMaximumHeight(360)
-        
+        card.setFixedWidth(320)
+        card.setMinimumHeight(470)
+        card.setMaximumHeight(470)
+
         card.setStyleSheet("""
             QFrame {
                 background-color: white;
@@ -302,8 +297,11 @@ class ReservationsWindow(QWidget):
 
         layout = QVBoxLayout(card)
         layout.setContentsMargins(18, 18, 18, 18)
-        layout.setSpacing(12)
+        layout.setSpacing(10)
 
+        # =========================
+        # TOP
+        # =========================
         top_row = QHBoxLayout()
 
         name_wrap = QVBoxLayout()
@@ -312,7 +310,7 @@ class ReservationsWindow(QWidget):
         title = QLabel(f"{car['brand']} {car['model']}")
         title.setStyleSheet("""
             color: #1d2736;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             border: none;
         """)
@@ -328,12 +326,36 @@ class ReservationsWindow(QWidget):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
+        status_badge = QLabel(car["state"])
+
+        if car["state"] == "Available":
+            status_badge.setStyleSheet("""
+                background-color: #eafaf0;
+                color: #1f9d55;
+                padding: 6px 10px;
+                border-radius: 11px;
+                font-size: 11px;
+                font-weight: 800;
+            """)
+        else:
+            status_badge.setStyleSheet("""
+                background-color: #ffe9e9;
+                color: #dc2626;
+                padding: 6px 10px;
+                border-radius: 11px;
+                font-size: 11px;
+                font-weight: 800;
+            """)
+
         top_row.addLayout(name_wrap)
         top_row.addStretch()
+        top_row.addWidget(status_badge)
 
+        # =========================
+        # IMAGE
+        # =========================
         image_box = QFrame()
-        image_box.setFixedHeight(140) 
-        
+        image_box.setFixedHeight(185)
         image_box.setStyleSheet("""
             QFrame {
                 background: qlineargradient(
@@ -345,32 +367,58 @@ class ReservationsWindow(QWidget):
                 border-radius: 12px;
             }
         """)
+
         image_layout = QVBoxLayout(image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         car_image = QLabel()
         car_image.setAlignment(Qt.AlignCenter)
         car_image.setStyleSheet("background: transparent; border: none;")
+        car_image.setFixedSize(280, 170)
 
-        img_path = car["image_path"].lstrip("/")
-        pixmap = QPixmap(img_path)
-    
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        image_name = os.path.basename(str(car["image_path"]).strip())
+        if not image_name.lower().endswith((".png", ".jpg", ".jpeg")):
+            image_name += ".png"
+
+        full_path = os.path.join(BASE_DIR, "imgs", image_name)
+        print("Reservation image path:", full_path)
+
+        pixmap = QPixmap(full_path)
+
         if not pixmap.isNull():
+            image_width = 280
+            image_height = 200
+
             scaled_pixmap = pixmap.scaled(
-                340, 140, 
-                Qt.KeepAspectRatioByExpanding, 
+                image_width,
+                image_height,
+                Qt.KeepAspectRatioByExpanding,
                 Qt.SmoothTransformation
             )
-            
-            car_image.setFixedSize(340, 140) 
-            car_image.setPixmap(scaled_pixmap)
-            
+
+            x = max(0, (scaled_pixmap.width() - image_width) // 2)
+            y = max(0, (scaled_pixmap.height() - image_height) // 2)
+
+            cropped_pixmap = scaled_pixmap.copy(
+                x,
+                y,
+                image_width,
+                image_height
+            )
+
+            car_image.setFixedSize(image_width, image_height)
+            car_image.setPixmap(cropped_pixmap)
         else:
             car_image.setText("🚗")
             car_image.setStyleSheet("font-size: 34px; color: #5c6b7c; background: transparent;")
 
         image_layout.addWidget(car_image, alignment=Qt.AlignCenter)
 
+        # =========================
+        # CHIPS
+        # =========================
         chips_row = QHBoxLayout()
         chips_row.setSpacing(8)
 
@@ -380,8 +428,11 @@ class ReservationsWindow(QWidget):
         chips_row.addWidget(self.make_small_chip(car["fuel_type"]))
         chips_row.addStretch()
 
+        # =========================
+        # INFO
+        # =========================
         info_wrap = QVBoxLayout()
-        info_wrap.setSpacing(4)
+        info_wrap.setSpacing(3)
 
         branch = QLabel("Athens Center")
         branch.setStyleSheet("""
@@ -401,8 +452,11 @@ class ReservationsWindow(QWidget):
         info_wrap.addWidget(branch)
         info_wrap.addWidget(extra)
 
+        # =========================
+        # BOTTOM
+        # =========================
         bottom_row = QHBoxLayout()
-        bottom_row.setSpacing(15) 
+        bottom_row.setSpacing(12)
 
         btn_details = QPushButton("Details")
         btn_details.setCursor(Qt.PointingHandCursor)
@@ -420,28 +474,32 @@ class ReservationsWindow(QWidget):
                 background-color: #f8fafc;
             }
         """)
-        reservation=functions.GetReservationByCarID(car['car_id'],self.session_email)
-        print(reservation)
+
+        reservation = functions.GetReservationByCarID(car['car_id'], self.session_email)
+
         btn_cancel = QPushButton("Cancel")
         btn_cancel.clicked.connect(lambda: self.cancel_reservation(reservation['reservation_id']))
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.setStyleSheet("""
-                QPushButton {
-                    background-color: #BB5327;
-                    color: white;
-                    border: none;
-                    border-radius: 10px;
-                    padding: 10px 18px;
-                    font-size: 13px;
-                    font-weight: 800;
-                }
-                QPushButton:hover {
-                    background-color: #ff9999;
-                }
-            """)
-        res = functions.GetReservationByCarID(car["car_id"],self.session_email)
-        print(res)
-        price_label = QLabel(f"€{res['total_price']} <span style='color: #6b7788; font-size: 18px; font-weight: 500;'>Total</span>")
+            QPushButton {
+                background-color: #BB5327;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                padding: 10px 18px;
+                font-size: 13px;
+                font-weight: 800;
+            }
+            QPushButton:hover {
+                background-color: #a94822;
+            }
+        """)
+
+        res = functions.GetReservationByCarID(car["car_id"], self.session_email)
+
+        price_label = QLabel(
+            f"€{res['total_price']} <span style='color: #6b7788; font-size: 12px; font-weight: 500;'>Total</span>"
+        )
         price_label.setStyleSheet("""
             color: #1d2736;
             font-size: 18px;
@@ -451,13 +509,17 @@ class ReservationsWindow(QWidget):
 
         bottom_row.addWidget(btn_details)
         bottom_row.addStretch()
-        bottom_row.addWidget(price_label) 
+        bottom_row.addWidget(price_label)
         bottom_row.addWidget(btn_cancel)
 
+        # =========================
+        # FINAL LAYOUT
+        # =========================
         layout.addLayout(top_row)
         layout.addWidget(image_box)
         layout.addLayout(chips_row)
         layout.addLayout(info_wrap)
+        layout.addStretch()
         layout.addLayout(bottom_row)
 
         return card

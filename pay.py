@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
 from back_end import classes
 class PaymentWindow(QWidget):
-    #            self.payment_screen = PaymentWindow(self.session_email, start_str, end_str, car)
+    
 
     def __init__(self, session_email,start_date, end_date, car):
         super().__init__()
@@ -69,14 +69,21 @@ class PaymentWindow(QWidget):
 
         card_layout.addWidget(QLabel("CARD NUMBER", styleSheet=header_style))
         self.card_input = QLineEdit()
-        self.card_input.setInputMask("9999 9999 9999 9999")
+        self.card_input.setPlaceholderText("0000 0000 0000 0000")
+        self.card_input.setMaxLength(19)
         self.card_input.setStyleSheet(input_style)
+        self.card_input.textChanged.connect(self.format_card)
         card_layout.addWidget(self.card_input)
 
         row = QHBoxLayout()
-        exp_lt = QVBoxLayout(); exp_lt.addWidget(QLabel("EXPIRY", styleSheet=header_style))
-        self.exp_input = QLineEdit(); self.exp_input.setInputMask("99/99"); self.exp_input.setStyleSheet(input_style)
-        exp_lt.addWidget(self.exp_input); row.addLayout(exp_lt)
+        exp_lt = QVBoxLayout() 
+        exp_lt.addWidget(QLabel("EXPIRY", styleSheet=header_style))
+        self.exp_input = QLineEdit()
+        self.exp_input.setPlaceholderText("MM/YY")
+        self.exp_input.setStyleSheet(input_style)
+        self.exp_input.textChanged.connect(self.format_expiry)
+        exp_lt.addWidget(self.exp_input)
+        row.addLayout(exp_lt)
 
         cvv_lt = QVBoxLayout(); cvv_lt.addWidget(QLabel("CVV", styleSheet=header_style))
         self.cvv_input = QLineEdit(); self.cvv_input.setEchoMode(QLineEdit.Password); self.cvv_input.setMaxLength(3); self.cvv_input.setStyleSheet(input_style)
@@ -123,6 +130,38 @@ class PaymentWindow(QWidget):
             self.go_to_main()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Database error: {e}")
+
+    def format_card(self, text):
+        # Αφαίρεση οτιδήποτε δεν είναι αριθμός
+        digits = ''.join(filter(str.isdigit, text))
+        
+        # ΚΟΒΟΥΜΕ αυστηρά στα 16 ψηφία maximum
+        digits = digits[:16]
+        
+        # Χωρισμός ανά 4 ψηφία με ένα κενό
+        formatted = ' '.join(digits[i:i+4] for i in range(0, len(digits), 4))
+        
+        self.card_input.blockSignals(True)
+        self.card_input.setText(formatted)
+        self.card_input.setCursorPosition(len(formatted)) # Κέρσορας πάντα στο τέλος
+        self.card_input.blockSignals(False)
+
+    def format_expiry(self, text):
+        # Αφαίρεση οτιδήποτε δεν είναι αριθμός
+        digits = ''.join(filter(str.isdigit, text))
+        
+        # ΚΟΒΟΥΜΕ αυστηρά στα 4 ψηφία (Μήνας-Έτος)
+        digits = digits[:4]
+        
+        # Προσθήκη της καθέτου μετά τα πρώτα 2 ψηφία (MM/YY)
+        formatted = digits
+        if len(digits) > 2:
+            formatted = digits[:2] + '/' + digits[2:]
+            
+        self.exp_input.blockSignals(True)
+        self.exp_input.setText(formatted)
+        self.exp_input.setCursorPosition(len(formatted)) # Κέρσορας πάντα στο τέλος
+        self.exp_input.blockSignals(False)
 
     def resizeEvent(self, event):
         if not self.original_pixmap.isNull():
