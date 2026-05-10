@@ -14,32 +14,24 @@ class FilterDialog(QDialog):
     def __init__(self, parent=None): 
         super().__init__(parent)
         self.setWindowTitle("Filter")
-
         layout = QVBoxLayout(self)
 
         form = QFormLayout()
-
         self.price_input = QLineEdit()
         self.year_input = QLineEdit()
         self.cc_input = QLineEdit()
         self.hp_input = QLineEdit()
-
-        self.price_input.setPlaceholderText("e.g. 50")
-        self.year_input.setPlaceholderText("e.g. 2020")
-        self.cc_input.setPlaceholderText("e.g. 1400")
-        self.hp_input.setPlaceholderText("e.g. 100")
-
+        
         form.addRow("Max Price (€):", self.price_input)
         form.addRow("Min Year:", self.year_input)
         form.addRow("Min CC:", self.cc_input)
         form.addRow("Min HP:", self.hp_input)
-
         layout.addLayout(form)
-
+        
         btn = QPushButton("Apply")
         btn.clicked.connect(self.accept)
         layout.addWidget(btn)
-
+    
     def get_values(self):
         p = self.price_input.text().strip()
         y = self.year_input.text().strip()
@@ -51,7 +43,7 @@ class FilterDialog(QDialog):
             int(y) if y else None,
             int(cc) if cc else None,
             int(hp) if hp else None
-        )
+            )
 class RentDetails(QDialog):
     def __init__(self, total_price, parent=None): 
         super().__init__(parent)
@@ -87,6 +79,105 @@ class RentDetails(QDialog):
         # Connections
         self.btn_yes.clicked.connect(self.accept) # Κλείνει το dialog με True
         self.btn_no.clicked.connect(self.reject)  # Κλείνει το dialog με False
+
+class CarDetailsDialog(QDialog):
+    def __init__(self, car, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Car Details")
+        self.setMinimumWidth(450)
+        
+        # Dark Theme Styling
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #1a1a1a;
+                border-radius: 12px;
+            }
+            QLabel {
+                color: #ffffff;
+                background: transparent;
+            }
+        """)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(12)
+
+        # 1. Όνομα & Κυβικά/Έτος
+        title = QLabel(f"{car['brand']} {car['model']}")
+        title.setStyleSheet("font-size: 18px; font-weight: bold;")
+        layout.addWidget(title)
+
+        subtitle = QLabel(f"{car['cc']} cc • {car['production_year']}")
+        subtitle.setStyleSheet("color: #a3a3a3; font-size: 13px;")
+        layout.addWidget(subtitle)
+
+        layout.addSpacing(10)
+
+        # 2. Εικόνα Αυτοκινήτου
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        filename = f"{car['image_path']}.png"
+        full_path = os.path.join(BASE_DIR, "imgs", filename)
+        
+        car_image = QLabel()
+        pixmap = QPixmap(full_path)
+        if not pixmap.isNull():
+            scaled_pixmap = pixmap.scaled(400, 150, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+            car_image.setPixmap(scaled_pixmap)
+        else:
+            car_image.setText("[εικόνα]")
+            car_image.setAlignment(Qt.AlignCenter)
+            car_image.setStyleSheet("color: #a3a3a3; border: 1px dashed #444; padding: 40px;")
+            
+        layout.addWidget(car_image)
+        layout.addSpacing(10)
+
+        # 3. Μπάρα Χαρακτηριστικών
+        specs_str = f"{car['doors']} Doors  |  {car['seats']} Seats  |  {car['transmission_type']}  |  {car['fuel_type']}"
+        specs_lbl = QLabel(specs_str)
+        specs_lbl.setStyleSheet("font-size: 13px; font-weight: bold;")
+        layout.addWidget(specs_lbl)
+        
+        layout.addSpacing(15)
+
+        # 4. Τοποθεσία
+        branch = QLabel("Athens Center")
+        branch.setStyleSheet("font-size: 14px; font-weight: bold;")
+        layout.addWidget(branch)
+
+        # 5. Additional Benefits
+        benefits_title = QLabel("Additional Benefits")
+        benefits_title.setStyleSheet("color: #a3a3a3; font-size: 14px;")
+        layout.addWidget(benefits_title)
+
+        benefits_layout = QVBoxLayout()
+        benefits_layout.setSpacing(6)
+        
+        benefits = [
+            "Full insurance package",
+            "Instant confirmation",
+            "Free cancellation",
+            "Same to same fuel policy"
+        ]
+
+        # Τα πορτοκαλί/κίτρινα Checkmarks (Όπως στο mockup)
+        for b in benefits:
+            b_lbl = QLabel(f"✓ {b}")
+            b_lbl.setStyleSheet("color: #ffb84d; font-size: 13px; font-weight: bold;") 
+            benefits_layout.addWidget(b_lbl)
+
+        layout.addLayout(benefits_layout)
+        layout.addSpacing(20)
+
+        # 6. Τιμή & Rent Button (Κάτω σειρά)
+        bottom_row = QHBoxLayout()
+        
+        price_lbl = QLabel(f"€{car['price']} <span style='font-size: 12px; font-weight: normal;'>/ day</span>")
+        price_lbl.setStyleSheet("font-size: 16px; font-weight: bold;")
+        bottom_row.addWidget(price_lbl)
+        
+        bottom_row.addStretch()
+
+        layout.addLayout(bottom_row)
 
 class MainDashboard(QMainWindow):
     def __init__(self,session_email:str):
@@ -561,7 +652,6 @@ class MainDashboard(QMainWindow):
  
     def open_filters(self):
         dialog = FilterDialog(self)
-
         if dialog.exec():
             try:
                 price, year, cc, hp = dialog.get_values()
@@ -571,15 +661,13 @@ class MainDashboard(QMainWindow):
                 else:
                     filtered = functions.FilterCars(price, year, cc, hp)
                 
-                if isinstance(filtered, list):
+                if isinstance(filtered, list): # elegxos an oti hr8e apo thn DB einai sthn List
                     self.update_grid(filtered)
                 else:
                     print(f"functions.py den esteile thn lista {filtered}")
-                    self.update_grid([])
-
+                    self.update_grid([]) # an den esteile lista, emfanise keno
             except ValueError:
                 print("Error please enter only numbers!")
-
     def logout(self):
         from login import LoginWindow
         self.login_window = LoginWindow() 
@@ -789,9 +877,8 @@ class MainDashboard(QMainWindow):
         self.stacked_widget.setCurrentIndex(1)
 
     def show_dashboard(self):
-        self.refresh_dashboard()
         self.stacked_widget.setCurrentIndex(0)
-      
+        self.refresh_dashboard()
     
 
 
@@ -853,10 +940,17 @@ class MainDashboard(QMainWindow):
             self.payment_screen = PaymentWindow(self.session_email, start_str, end_str,car)
             self.payment_screen.show()
             self.close() # Κλείνουμε το dashboard όσο πληρώνει
+
+    def show_car_details(self, car):
+        # Ανοίγει το custom popup που φτιάξαμε
+        dialog = CarDetailsDialog(car, self)
+        dialog.exec()
+
     def create_car_card(self, car):
         card = QFrame()
-        card.setMinimumHeight(360)
-        card.setMaximumHeight(360)
+        card.setFixedWidth(320)
+        card.setMinimumHeight(460)
+        card.setMaximumHeight(460)
         
         card.setStyleSheet("""
             QFrame {
@@ -927,7 +1021,7 @@ class MainDashboard(QMainWindow):
         top_row.addWidget(status_badge)
 
         image_box = QFrame()
-        image_box.setFixedHeight(140) 
+        image_box.setFixedHeight(220) 
         
         image_box.setStyleSheet("""
             QFrame {
@@ -963,12 +1057,12 @@ class MainDashboard(QMainWindow):
     
         if not pixmap.isNull():
             scaled_pixmap = pixmap.scaled(
-                340, 140, 
+                280, 200, 
                 Qt.KeepAspectRatioByExpanding, 
                 Qt.SmoothTransformation
             )
             
-            car_image.setFixedSize(340, 140) 
+            #car_image.setFixedSize(280, 210) 
             car_image.setPixmap(scaled_pixmap)
             
         else:
@@ -1012,6 +1106,7 @@ class MainDashboard(QMainWindow):
 
         btn_details = QPushButton("Details")
         btn_details.setCursor(Qt.PointingHandCursor)
+        btn_details.clicked.connect(lambda checked=False, c=car: self.show_car_details(c))
         btn_details.setStyleSheet("""
             QPushButton {
                 background-color: white;
@@ -1029,7 +1124,7 @@ class MainDashboard(QMainWindow):
 
         btn_rent = QPushButton("Rent")
         btn_rent.setCursor(Qt.PointingHandCursor)
-        btn_rent.clicked.connect(lambda: self.handle_rent(car))
+        btn_rent.clicked.connect(lambda checked=False, c=car: self.handle_rent(c))
 
         if car["state"] == "Available":
             btn_rent.setStyleSheet("""
