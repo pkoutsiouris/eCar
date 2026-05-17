@@ -161,6 +161,8 @@ class DealerWindow(QMainWindow):
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         table.setStyleSheet("color: black; background: white;")
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setSelectionMode(QAbstractItemView.NoSelection) 
+        table.setFocusPolicy(Qt.NoFocus)
 
         if res_data:
             for row, res in enumerate(res_data):
@@ -199,6 +201,7 @@ class DealerWindow(QMainWindow):
 
         # Στυλ για τα Inputs
         # Καθαρό στυλ χωρίς gradients για τα inputs
+        # Καθαρό στυλ χωρίς gradients για τα inputs και τις λίστες
         input_style = """
             QWidget#CarContainer {
                 background-color: #f1f5f9; /* Ελαφρύ γκρι φόντο για όλη τη σελίδα */
@@ -219,6 +222,16 @@ class DealerWindow(QMainWindow):
                 font-weight: 700;
                 color: #334155;
                 background: transparent; /* Σημαντικό για να μην παίρνει το gradient */
+            }
+            
+            /* --- ΠΡΟΣΘΗΚΗ ΓΙΑ ΤΑ DROP-DOWNS --- */
+            QComboBox QAbstractItemView {
+                background-color: white;
+                color: #1e293b;
+                selection-background-color: #3b82f6; /* Μπλε χρώμα όταν περνάς το ποντίκι */
+                selection-color: white; /* Λευκά γράμματα στην επιλογή */
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
             }
         """
         container.setObjectName("CarContainer")
@@ -385,6 +398,8 @@ class DealerWindow(QMainWindow):
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         table.setStyleSheet("color: black; background: white;")
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setSelectionMode(QAbstractItemView.NoSelection) 
+        table.setFocusPolicy(Qt.NoFocus)
 
         if cars:
             for row, car in enumerate(cars):
