@@ -1,4 +1,5 @@
 import functions
+import unittest
 
 class User:
     def __init__(self, username: str, password: str, role: str, firstname: str ,
@@ -215,4 +216,4 @@ def main():
 
 # Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":
-    main() 
+    unittest.main() 
