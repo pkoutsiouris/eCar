@@ -52,11 +52,12 @@ def ConnectDB():
         WriteErrorLog("ConnectDB",str(err))
         return None
     
-def CheckCarExists(car: classes.Car):
+def CheckCarExists(plate):
     try:
+
         conn,db = ConnectDB()
         query = "select * from cars where license_plate=%s"
-        db.execute(query,(car.plate,))
+        db.execute(query,(plate,))
         res = db.fetchone()
         if res is None:
             return False
@@ -298,10 +299,10 @@ def GiveAdminAccess(email: str):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
-def DeleteCar(car: classes.Car):
+def DeleteCar(plate):
     try:
         conn,db = ConnectDB() 
-        if CheckCarExists(car):
+        if CheckCarExists(plate):
             print("Car doesn't exists")  
             return False
            
