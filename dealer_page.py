@@ -247,7 +247,7 @@ class DealerWindow(QMainWindow):
         self.f_hp = QSpinBox(); self.f_hp.setRange(50, 1500)
         self.f_fuel = QComboBox(); self.f_fuel.addItems(['Gas', 'Diesel', 'Hybrid', 'Electric'])
         self.f_trans = QComboBox(); self.f_trans.addItems(['Manual', 'Auto'])
-        self.f_state = QComboBox(); self.f_state.addItems(['Available', 'In_Service', 'Unavailable'])
+        self.f_state = QComboBox(); self.f_state.addItems(['Available', 'In Service', 'Unavailable'])
         self.f_price = QDoubleSpinBox(); self.f_price.setRange(0, 5000); self.f_price.setSuffix(" €")
         self.f_desc = QLineEdit(); self.f_desc.setPlaceholderText("Short vehicle description...")
 
@@ -353,6 +353,8 @@ class DealerWindow(QMainWindow):
             final_img_name = "default.png"
 
         # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
+        # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
+        # Δημιουργία instance Car με το ΟΝΟΜΑ του αρχείου (όχι όλο το path)
         new_car = classes.Car(
             brand=self.f_brand.text(),
             model=self.f_model.text(),
@@ -361,12 +363,12 @@ class DealerWindow(QMainWindow):
             seats=self.f_seats.value(),
             doors=self.f_doors.value(),
             cc=self.f_cc.value(),
-            state=self.f_state.currentText(),
+            state=self.f_state.currentText().replace(' ', '_'),
             desc=self.f_desc.text(),
             fuel=self.f_fuel.currentText(),
             trans=self.f_trans.currentText(),
             horsepower=self.f_hp.value(),
-            imgPath=final_img_name, # Αποθηκεύουμε μόνο το όνομα (π.χ. ABC-1234.png)
+            imgPath=final_img_name, 
             price=self.f_price.value(),
             availability=True
         )
