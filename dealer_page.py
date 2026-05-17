@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QFrame, QTableWidget, QTableWidgetItem, 
     QHeaderView, QStackedWidget, QButtonGroup, QMessageBox, 
-    QLineEdit, QFormLayout, QComboBox, QSpinBox, QDoubleSpinBox, QScrollArea, QFileDialog, QGridLayout
+    QLineEdit, QFormLayout, QComboBox, QSpinBox, QDoubleSpinBox, QScrollArea, QFileDialog, QGridLayout, QDialog, QAbstractItemView
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
@@ -106,6 +106,8 @@ class DealerWindow(QMainWindow):
         self.pages.addWidget(self.create_car_page())        # Index 1
         self.pages.addWidget(self.create_res_page())        # Index 2
 
+        self.show_dashboard()
+
     def make_nav_btn(self, text, checked=False):
         btn = QPushButton(text)
         btn.setCheckable(True)
@@ -130,7 +132,9 @@ class DealerWindow(QMainWindow):
         table.setHorizontalHeaderLabels(["Brand", "Model", "Plate", "Status", "Price/Day"])
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         table.setStyleSheet("color: black; background: white;")
+        table.setEditTriggers(QTableWidget.NoEditTriggers)
         
+
         if cars:
             for row, car in enumerate(cars):
                 table.setItem(row, 0, QTableWidgetItem(car['brand']))
@@ -156,6 +160,7 @@ class DealerWindow(QMainWindow):
         table.setHorizontalHeaderLabels(["Res ID", "Car ID", "Customer", "Start Date", "End Date", "Total Price"])
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         table.setStyleSheet("color: black; background: white;")
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         if res_data:
             for row, res in enumerate(res_data):
@@ -379,7 +384,8 @@ class DealerWindow(QMainWindow):
         table.setHorizontalHeaderLabels(["Brand", "Model", "Plate", "Status", "Price/Day", "Actions"])
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         table.setStyleSheet("color: black; background: white;")
-        
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
         if cars:
             for row, car in enumerate(cars):
                 table.setItem(row, 0, QTableWidgetItem(car['brand']))
@@ -389,21 +395,143 @@ class DealerWindow(QMainWindow):
                 table.setItem(row, 4, QTableWidgetItem(str(car['price'])))
                 
                 # Δημιουργία κουμπιού διαγραφής
-                btn_delete = QPushButton("Delete")
-                btn_delete.setStyleSheet("""
-                    QPushButton { 
-                        background-color: #ef4444; color: white; border-radius: 4px; padding: 5px; 
-                    }
-                    QPushButton:hover { background-color: #dc2626; }
-                """)
-                # Χρήση license_plate ως μοναδικό αναγνωριστικό για τη διαγραφή
+            
                 plate = car['license_plate']
+                current_price = car['price']
+                current_state = car['state']
+
+                action_widget = QWidget()
+                action_layout = QHBoxLayout(action_widget)
+                action_layout.setContentsMargins(0, 0, 0, 0)
+                action_layout.setSpacing(5)
+
+                btn_edit = QPushButton("Edit")
+                btn_edit.setCursor(Qt.PointingHandCursor)
+                btn_edit.setStyleSheet("background-color: #3b82f6; color: white; border-radius: 4px; padding: 5px;")
+                btn_edit.clicked.connect(lambda checked, p=plate, cp=current_price, cs=current_state: self.edit_car_action(p, cp, cs))
+
+                btn_delete = QPushButton("Delete")
+                btn_delete.setCursor(Qt.PointingHandCursor)
+                btn_delete.setStyleSheet("background-color: #ef4444; color: white; border-radius: 4px; padding: 5px;")
                 btn_delete.clicked.connect(lambda checked, p=plate: self.delete_car_action(p))
+
+                action_layout.addWidget(btn_edit)
+                action_layout.addWidget(btn_delete)
                 
-                table.setCellWidget(row, 5, btn_delete)
+                table.setCellWidget(row, 5, action_widget)
+                
         
         self.dash_layout.addWidget(table)
         self.pages.setCurrentIndex(0)
+    
+    def edit_car_action(self, plate, current_price, current_state):
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Επεξεργασία: {plate}")
+        dialog.setFixedWidth(360)
+        dialog.setStyleSheet("""
+            QDialog { background-color: #f8fafc; border-radius: 12px; }
+            QLabel { font-weight: bold; color: #334155; font-size: 14px; }
+        """)
+        
+        layout = QVBoxLayout(dialog)
+        layout.setSpacing(15)
+        layout.setContentsMargins(25, 25, 25, 25)
+        
+        title = QLabel(f"Ρυθμίσεις Οχήματος\n{plate}")
+        title.setStyleSheet("font-size: 18px; color: #1e293b; margin-bottom: 10px;")
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+        
+        form = QFormLayout()
+        form.setSpacing(15)
+        
+        # Πεδίο Τιμής με προστασία
+        price_input = QDoubleSpinBox()
+        price_input.setRange(0, 10000)
+        price_input.setSingleStep(50.0) 
+        
+        try:
+            # Καθαρίζουμε την τιμή από σύμβολα πριν τη μετατρέψουμε σε δεκαδικό αριθμό (float)
+            clean_price = float(str(current_price).replace('€', '').replace(',', '.').strip())
+        except ValueError:
+            clean_price = 0.0
+            
+        price_input.setValue(clean_price)
+        price_input.setSuffix(" €")
+        price_input.setStyleSheet("""
+            QDoubleSpinBox {
+                padding: 10px; border: 1px solid #cbd5e1; 
+                border-radius: 6px; background-color: white; 
+                color: #1e293b; font-size: 14px;
+            }
+        """)
+        
+        # Πεδίο Κατάστασης με σωστά χρώματα
+        state_input = QComboBox()
+        state_input.addItems(['Available', 'In Service', 'Unavailable'])
+        
+        display_state = str(current_state).replace('_', ' ')
+        state_input.setCurrentText(display_state)
+        
+        state_input.setStyleSheet("""
+            QComboBox {
+                padding: 10px; border: 1px solid #cbd5e1; 
+                border-radius: 6px; background-color: white; 
+                color: #1e293b; font-size: 14px;
+            }
+            QComboBox QAbstractItemView {
+                background-color: white; color: #1e293b;
+                selection-background-color: #3b82f6; selection-color: white;
+            }
+        """)
+        
+        form.addRow("Τιμή / Ημέρα:", price_input)
+        form.addRow("Κατάσταση:", state_input)
+        layout.addLayout(form)
+        
+        btn_layout = QHBoxLayout()
+        btn_cancel = QPushButton("Ακύρωση")
+        btn_cancel.setCursor(Qt.PointingHandCursor)
+        btn_cancel.setStyleSheet("""
+            QPushButton { background-color: #e2e8f0; color: #475569; padding: 10px; border-radius: 6px; font-weight: bold; }
+            QPushButton:hover { background-color: #cbd5e1; }
+        """)
+        btn_cancel.clicked.connect(dialog.reject)
+        
+        btn_save = QPushButton("Αποθήκευση")
+        btn_save.setCursor(Qt.PointingHandCursor)
+        btn_save.setStyleSheet("""
+            QPushButton { background-color: #3b82f6; color: white; padding: 10px; border-radius: 6px; font-weight: bold; }
+            QPushButton:hover { background-color: #2563eb; }
+        """)
+        btn_save.clicked.connect(dialog.accept)
+        
+        btn_layout.addWidget(btn_cancel)
+        btn_layout.addWidget(btn_save)
+        layout.addLayout(btn_layout)
+        
+        if dialog.exec():
+            new_price = price_input.value()
+            new_state = state_input.currentText().replace(' ', '_')
+            
+            # Απευθείας εγγραφή (bypass) στη βάση δεδομένων
+            try:
+                conn, db = functions.ConnectDB()
+                availability = 1 if new_state == "Available" else 0 
+                
+                query = "UPDATE cars SET price=%s, state=%s, availability=%s WHERE license_plate=%s"
+                db.execute(query, (new_price, new_state, availability, plate))
+                conn.commit()
+                
+                QMessageBox.information(self, "Επιτυχία", f"Τα στοιχεία του οχήματος ενημερώθηκαν!")
+                self.show_dashboard()
+                
+            except Exception as e:
+                QMessageBox.warning(self, "Σφάλμα", f"Αποτυχία ενημέρωσης: {e}")
+            finally:
+                if 'db' in locals() and db is not None: db.close()
+                if 'conn' in locals() and conn is not None: conn.close()
+
     def delete_car_action(self, plate):
         # Παράθυρο επιβεβαίωσης
         confirm = QMessageBox.question(
