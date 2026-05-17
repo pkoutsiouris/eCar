@@ -632,3 +632,90 @@ def ShowReservations():
             db.close()
         if 'conn' in locals() and conn is not None:
             conn.close()
+
+
+
+def ChangeCarDescr(car : classes.Car, new_desc: str):
+    try:
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckCarExists(car):
+            print("Car doesn't exist")  
+            return False
+            
+        query="update cars set car_description=%s where license_plate=%s"
+        db.execute(query,(new_desc, car.plate))
+        conn.commit()
+        print("Επιτυχία")
+        return True
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def ChangeCarPrice(car : classes.Car, new_price: float):
+    try:
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckCarExists(car):
+            print("Car doesn't exist")  
+            return False
+            
+        query="update cars set price=%s where license_plate=%s"
+        db.execute(query,(new_price, car.plate))
+        conn.commit()
+        print("Επιτυχία")
+        return True
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def ChangeCarState(car : classes.Car):
+    try:
+        conn,db = ConnectDB()
+
+        if conn is None or db is None:
+            print("Failed to connect with database.")
+            return
+        
+        if not CheckCarExists(car):
+            print("Car doesn't exist")  
+            return False
+        
+        # Ο dealer μόνο σε unavailable θα μπορεί να αλλάξει το state
+        query="update cars set state='Unavailable' where license_plate=%s"
+        db.execute(query, [car.plate])
+        conn.commit()
+        print("Επιτυχία")
+        return True
+    
+    except Exception as e:
+        print(f"Error during update: {e}")   
+        return False
+    
+    finally:
+        if 'db' in locals() and db is not None:
+            db.close()
+        if 'conn' in locals() and conn is not None:
+            conn.close()
