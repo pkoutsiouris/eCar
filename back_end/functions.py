@@ -307,6 +307,7 @@ def DeleteCar(plate):
             return False
            
         query = "delete from cars where car_id=%s"
+        car = GetCarByLicense(plate)
         db.execute(query,(car.car_id))
         conn.commit()
         msg = f"Deleted car with id: {car.car_id}"
