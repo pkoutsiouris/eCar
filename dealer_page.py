@@ -71,6 +71,28 @@ class DealerWindow(QMainWindow):
         sidebar_layout.addStretch()
         shell_layout.addWidget(sidebar)
 
+        btn_view = QPushButton("View Listing As User")
+        btn_view.setCursor(Qt.PointingHandCursor)
+        btn_view.setMinimumHeight(46)
+        btn_view.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 14px 22px;
+                border: none;
+                font-size: 14px;
+                font-weight: 700;
+                color: #f87171;
+                background: transparent;
+                border-left: 4px solid transparent;
+            }
+            QPushButton:hover {
+                background-color: #3d2424;
+                color: #ff4444;
+            }
+        """)
+        btn_view.clicked.connect(self.view)
+        sidebar_layout.addWidget(btn_view)
+
         btn_logout = QPushButton("Logout")
         btn_logout.setCursor(Qt.PointingHandCursor)
         btn_logout.setMinimumHeight(46)
@@ -574,10 +596,14 @@ class DealerWindow(QMainWindow):
         self.login_win = LoginWindow()
         self.login_win.show()
         self.close()
+    def view(self):
+        from main_dealer import MainDealerWindow
+        self.dealer_win = MainDealerWindow(self.session_email)
+        self.dealer_win.show()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # Χρησιμοποιήστε ένα test email για να εκτελεστεί το παράθυρο
-    window = DealerWindow("test@gmail.com") 
+    window = DealerWindow(None) 
     window.show()
     sys.exit(app.exec())
