@@ -2,9 +2,10 @@ import sys
 import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, QDialog , QFormLayout, QLineEdit, QStackedWidget, QComboBox, 
+    QLabel, QPushButton, QScrollArea, QGridLayout, QFrame, QButtonGroup, 
+    QDialog, QFormLayout, QLineEdit, QStackedWidget, QComboBox, QDateEdit
 )
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QDate
 from back_end import functions
 from datetime import datetime
 from reservation_page import ReservationsWindow
@@ -484,11 +485,20 @@ class MainDashboard(QMainWindow):
         pickup_wrap = QVBoxLayout()
         pickup_label = QLabel("Pickup:")
         pickup_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
-        self.pickup_input = QLineEdit()
-        self.pickup_input.setPlaceholderText("YYYY-MM-DD")
+        # =========================
+        # Pickup Wrap
+        # =========================
+        pickup_wrap = QVBoxLayout()
+        pickup_label = QLabel("Pickup:")
+        pickup_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
+        
+        self.pickup_input = QDateEdit()
+        self.pickup_input.setCalendarPopup(True) # Ενεργοποιεί το ημερολόγιο
+        self.pickup_input.setDate(QDate.currentDate()) # Default: Σημερινή ημερομηνία
+        self.pickup_input.setDisplayFormat("yyyy-MM-dd")
         self.pickup_input.setMinimumHeight(44)
         self.pickup_input.setStyleSheet("""
-            QLineEdit {
+            QDateEdit {
                 background-color: white;
                 color: #1a2b27;
                 border: none;
@@ -497,21 +507,38 @@ class MainDashboard(QMainWindow):
                 font-size: 14px;
                 font-weight: 600;
             }
-            QLineEdit:focus {
+            QDateEdit:focus {
                 border: 2px solid #6a9a83;
+            }
+            QDateEdit::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 30px;
+                border-left: none;
+            }
+            QDateEdit::down-arrow {
+                image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a2b27' viewBox='0 0 16 16'><path d='M4 6h8l-4 5z'/></svg>");
+                width: 14px;
+                height: 14px;
             }
         """)
         pickup_wrap.addWidget(pickup_label)
         pickup_wrap.addWidget(self.pickup_input)
 
+        # =========================
+        # Drop-off Wrap
+        # =========================
         dropoff_wrap = QVBoxLayout()
         dropoff_label = QLabel("Drop-off:")
         dropoff_label.setStyleSheet("font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); background: transparent;")
-        self.dropoff_input = QLineEdit()
-        self.dropoff_input.setPlaceholderText("YYYY-MM-DD")
+        
+        self.dropoff_input = QDateEdit()
+        self.dropoff_input.setCalendarPopup(True) # Ενεργοποιεί το ημερολόγιο
+        self.dropoff_input.setDate(QDate.currentDate().addDays(1)) # Default: Αυριανή ημερομηνία
+        self.dropoff_input.setDisplayFormat("yyyy-MM-dd")
         self.dropoff_input.setMinimumHeight(44)
         self.dropoff_input.setStyleSheet("""
-            QLineEdit {
+            QDateEdit {
                 background-color: white;
                 color: #1a2b27;
                 border: none;
@@ -520,8 +547,19 @@ class MainDashboard(QMainWindow):
                 font-size: 14px;
                 font-weight: 600;
             }
-            QLineEdit:focus {
+            QDateEdit:focus {
                 border: 2px solid #6a9a83;
+            }
+            QDateEdit::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 30px;
+                border-left: none;
+            }
+            QDateEdit::down-arrow {
+                image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a2b27' viewBox='0 0 16 16'><path d='M4 6h8l-4 5z'/></svg>");
+                width: 14px;
+                height: 14px;
             }
         """)
         dropoff_wrap.addWidget(dropoff_label)
@@ -1070,8 +1108,8 @@ class MainDashboard(QMainWindow):
 
     def on_search_dates(self):
         """Validate dates, fetch available cars, show the grid."""
-        start_str = self.pickup_input.text().strip()
-        end_str = self.dropoff_input.text().strip()
+        start_str = self.pickup_input.date().toString("yyyy-MM-dd")
+        end_str = self.dropoff_input.date().toString("yyyy-MM-dd")
 
         # Validate format
         try:
