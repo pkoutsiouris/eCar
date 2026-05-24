@@ -517,9 +517,9 @@ class MainDashboard(QMainWindow):
                 border-left: none;
             }
             QDateEdit::down-arrow {
-                image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a2b27' viewBox='0 0 16 16'><path d='M4 6h8l-4 5z'/></svg>");
-                width: 14px;
-                height: 14px;
+                image: url("assets/calendar.png");
+                width: 30px;
+                height: 30px;
             }
         """)
         pickup_wrap.addWidget(pickup_label)
@@ -557,9 +557,9 @@ class MainDashboard(QMainWindow):
                 border-left: none;
             }
             QDateEdit::down-arrow {
-                image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a2b27' viewBox='0 0 16 16'><path d='M4 6h8l-4 5z'/></svg>");
-                width: 14px;
-                height: 14px;
+                image: url("assets/calendar.png");
+                width: 30px;
+                height: 30px;
             }
         """)
         dropoff_wrap.addWidget(dropoff_label)
