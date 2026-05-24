@@ -399,7 +399,7 @@ class MainDealerWindow(QMainWindow):
         self.sort_combo.setCursor(Qt.PointingHandCursor)
         self.sort_combo.setStyleSheet("""
             QComboBox {
-                background-color: white; color: #2b3547; border: 1px solid #d1ddd9;
+                background-color: white; color: #2b3547; border: 1px solid #ffffff;
                 border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 600;
             }
             QComboBox:hover { border: 1px solid #6a9a83; }
@@ -593,7 +593,7 @@ class MainDealerWindow(QMainWindow):
 
         form_card = QFrame()
         form_card.setFixedWidth(520)
-        form_card.setStyleSheet("QFrame { background-color: white; border: 1px solid #d1ddd9; border-radius: 15px; }")
+        form_card.setStyleSheet("QFrame { background-color: white; border: 1px solid #ffffff; border-radius: 15px; }")
         form_layout = QVBoxLayout(form_card)
         form_layout.setContentsMargins(28, 28, 28, 28)
         form_layout.setSpacing(14)
@@ -617,7 +617,7 @@ class MainDealerWindow(QMainWindow):
         self.confirm_password_input.setMinimumHeight(44)
 
         input_style = """
-            QLineEdit { background-color: #f8fafc; color: #1f2937; border: 1px solid #d1ddd9; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+            QLineEdit { background-color: #f8fafc; color: #1f2937; border: 1px solid #ffffff; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
             QLineEdit:focus { border: 1px solid #6a9a83; background-color: white; }
         """
         self.old_password_input.setStyleSheet(input_style)
@@ -693,7 +693,7 @@ class MainDealerWindow(QMainWindow):
 
     def make_small_chip(self, text):
         chip = QLabel(text)
-        chip.setStyleSheet("background-color: #e8efec; color: #3a5a54; border: 1px solid #d1ddd9; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700;")
+        chip.setStyleSheet("background-color: #e8efec; color: #3a5a54; border: 1px solid #ffffff; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700;")
         return chip
 
     def handle_rent(self, car):
@@ -707,7 +707,7 @@ class MainDealerWindow(QMainWindow):
         card.setFixedWidth(320)
         card.setMinimumHeight(460)
         card.setMaximumHeight(460)
-        card.setStyleSheet("QFrame { background-color: white; border: 1px solid #d1ddd9; border-radius: 15px; } QFrame:hover { border: 1px solid #cfd9e8; }")
+        card.setStyleSheet("QFrame { background-color: white; border: 1px solid #ffffff; border-radius: 15px; } QFrame:hover { border: 1px solid #ffffff; }")
 
         layout = QVBoxLayout(card)
         layout.setContentsMargins(18, 18, 18, 18)
@@ -740,7 +740,7 @@ class MainDealerWindow(QMainWindow):
 
         image_box = QFrame()
         image_box.setFixedHeight(220) 
-        image_box.setStyleSheet("QFrame { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eef4fb, stop:1 #f8fbff); border: 1px solid #eef2f7; border-radius: 12px; }")
+        image_box.setStyleSheet("QFrame { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eef4fb, stop:1 #f8fbff); border: 1px solid #ffffff; border-radius: 12px; }")
         image_layout = QVBoxLayout(image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
         
@@ -780,7 +780,7 @@ class MainDealerWindow(QMainWindow):
         btn_details = QPushButton("Details")
         btn_details.setCursor(Qt.PointingHandCursor)
         btn_details.clicked.connect(lambda checked=False, c=car: self.show_car_details(c))
-        btn_details.setStyleSheet("QPushButton { background-color: white; color: #334155; border: 1px solid #d5deeb; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 700; } QPushButton:hover { background-color: #f8fafc; }")
+        btn_details.setStyleSheet("QPushButton { background-color: white; color: #334155; border: 1px solid #ffffff; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 700; } QPushButton:hover { background-color: #f8fafc; }")
 
         btn_rent = QPushButton("Rent")
         btn_rent.setCursor(Qt.PointingHandCursor)
