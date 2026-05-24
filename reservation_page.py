@@ -300,7 +300,7 @@ class ReservationsWindow(QWidget):
         layout.setSpacing(10)
 
         # =========================
-        # TOP
+        # TOP (Brand, Model & Dates)
         # =========================
         top_row = QHBoxLayout()
 
@@ -326,30 +326,35 @@ class ReservationsWindow(QWidget):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
-        status_badge = QLabel(car["state"])
+        # Μορφοποίηση ημερομηνιών ΜΟΝΟ με έτος-μήνα-μέρα (χωρίς την ώρα)
+        pickup_dt = car['start_date'].strftime("%Y-%m-%d") if hasattr(car['start_date'], 'strftime') else str(car['start_date']).split()[0]
+        drop_dt = car['end_date'].strftime("%Y-%m-%d") if hasattr(car['end_date'], 'strftime') else str(car['end_date']).split()[0]
 
-        if car["state"] == "Available":
-            status_badge.setStyleSheet("""
-                background-color: #eafaf0;
-                color: #1f9d55;
-                padding: 6px 10px;
-                border-radius: 11px;
-                font-size: 11px;
-                font-weight: 800;
-            """)
-        else:
-            status_badge.setStyleSheet("""
-                background-color: #ffe9e9;
-                color: #dc2626;
-                padding: 6px 10px;
-                border-radius: 11px;
-                font-size: 11px;
-                font-weight: 800;
-            """)
+        # Section για τις Ημερομηνίες Κράτησης
+        dates_wrap = QVBoxLayout()
+        dates_wrap.setSpacing(1)
+        dates_wrap.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+        pickup_label = QLabel(f"<b>Pickup:</b> {pickup_dt}")
+        pickup_label.setStyleSheet("""
+            color: #3a5a54;
+            font-size: 11px;
+            border: none;
+        """)
+
+        drop_label = QLabel(f"<b>Drop-off:</b> {drop_dt}")
+        drop_label.setStyleSheet("""
+            color: #bb5327;
+            font-size: 11px;
+            border: none;
+        """)
+
+        dates_wrap.addWidget(pickup_label)
+        dates_wrap.addWidget(drop_label)
 
         top_row.addLayout(name_wrap)
         top_row.addStretch()
-        top_row.addWidget(status_badge)
+        top_row.addLayout(dates_wrap)
 
         # =========================
         # IMAGE
@@ -429,7 +434,7 @@ class ReservationsWindow(QWidget):
         chips_row.addStretch()
 
         # =========================
-        # INFO
+        # INFO (Branch & Description)
         # =========================
         info_wrap = QVBoxLayout()
         info_wrap.setSpacing(3)
@@ -442,7 +447,10 @@ class ReservationsWindow(QWidget):
             border: none;
         """)
 
-        extra = QLabel("Vehicle details available")
+        # Εμφάνιση της πραγματικής περιγραφής (car_description) από τη βάση δεδομένων
+        car_desc_text = car.get('car_description', 'No description available.')
+        extra = QLabel(car_desc_text)
+        extra.setWordWrap(True)  # Για να αλλάζει γραμμή αν είναι μεγάλη η περιγραφή
         extra.setStyleSheet("""
             color: #7a8799;
             font-size: 11px;
@@ -458,22 +466,7 @@ class ReservationsWindow(QWidget):
         bottom_row = QHBoxLayout()
         bottom_row.setSpacing(12)
 
-        btn_details = QPushButton("Details")
-        btn_details.setCursor(Qt.PointingHandCursor)
-        btn_details.setStyleSheet("""
-            QPushButton {
-                background-color: white;
-                color: #334155;
-                border: 1px solid #d5deeb;
-                border-radius: 10px;
-                padding: 10px 16px;
-                font-size: 13px;
-                font-weight: 700;
-            }
-            QPushButton:hover {
-                background-color: #f8fafc;
-            }
-        """)
+        # Το κουμπί Details αφαιρέθηκε από εδώ
 
         reservation = functions.GetReservationByCarID(car['car_id'], self.session_email)
 
@@ -507,9 +500,9 @@ class ReservationsWindow(QWidget):
             background: transparent;
         """)
 
-        bottom_row.addWidget(btn_details)
-        bottom_row.addStretch()
+        # Προσθέτουμε πλέον μόνο την τιμή και το κουμπί Cancel
         bottom_row.addWidget(price_label)
+        bottom_row.addStretch()  # Σπρώχνει το Cancel τέρμα δεξιά και κρατάει την τιμή αριστερά
         bottom_row.addWidget(btn_cancel)
 
         # =========================
