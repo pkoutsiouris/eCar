@@ -120,17 +120,17 @@ def GetCars():
 def CreateCar(car: classes.Car):
     try:
         conn,db = ConnectDB() 
-        if CheckCarExists(car):
+        if CheckCarExists(car.plate):
             print("Car already exists with license plate: " + car.plate)  
             return False
             
            
-        query=" INSERT INTO cars (brand, model, " \
+        query=" INSERT INTO cars (doors,brand, model, " \
         "production_year, license_plate, seats, cc, state, " \
         "car_description, fuel_type, transmission_type, horsepower, " \
         "image_path, price, availability) VALUES (" \
-        "%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
-        db.execute(query,(car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
+        "%s,%s , %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s,%s,%s)"
+        db.execute(query,(car.doors,car.brand,car.model,car.prod_year,car.plate,car.seats,car.cc,car.state,
                           car.desc,car.fuel,car.trans,car.horsepower,car.plate,car.price,car.availability))
         conn.commit()
         msg="Created Car with license plate: "+str(car.plate)
