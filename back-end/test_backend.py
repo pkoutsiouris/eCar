@@ -7,7 +7,7 @@ class TestCarRentalLogic(unittest.TestCase):
     def test_login_failure(self):
         """Εικονικός έλεγχος αυθεντικοποίησης"""
         print("Running: test_login_failure...")
-        # Προσομοίωση: Αν τα στοιχεία είναι λάθος, η απόκριση πρέπει να είναι False
+
         response = False 
         self.assertFalse(response)
 
@@ -34,7 +34,7 @@ class TestCarRentalLogic(unittest.TestCase):
         print("Running: test_reservation_dates_logic...")
         start_date = datetime(2025, 5, 10)
         end_date = datetime(2025, 5, 15)
-        # Η διάρκεια πρέπει να είναι θετικός αριθμός
+
         duration = (end_date - start_date).days
         self.assertGreater(duration, 0)
 
@@ -42,7 +42,7 @@ class TestCarRentalLogic(unittest.TestCase):
     def test_password_strength(self):
         """Έλεγχος αν το password πληροί το ελάχιστο όριο χαρακτήρων"""
         print("Running: test_password_strength...")
-        # Έστω ότι το σύστημα απαιτεί τουλάχιστον 6 χαρακτήρες
+
         user_password = "secure123"
         self.assertGreaterEqual(len(user_password), 6)
 
@@ -51,7 +51,7 @@ class TestCarRentalLogic(unittest.TestCase):
         """Έλεγχος αν η πινακίδα έχει το σωστό μήκος (π.χ. 7 χαρακτήρες)"""
         print("Running: test_license_plate_format...")
         plate = "ZXY1234"
-        # Έλεγχος αν η πινακίδα αποτελείται από 7 χαρακτήρες (3 γράμματα, 4 αριθμοί)
+
         self.assertEqual(len(plate), 7)
 
     # 7. 16 ψηφία καρτας
@@ -68,7 +68,7 @@ class TestCarRentalLogic(unittest.TestCase):
         """Έλεγχος αν ένας Admin μπορεί να διαγραφεί (πρέπει να απαγορεύεται)"""
         print("Running: test_admin_delete_protection...")
         user_to_delete = {"email": "admin@ecarrental.com", "role": "Admin"}
-        # Λογική: Αν ο ρόλος είναι Admin, η διαγραφή πρέπει να απορρίπτεται
+
         can_delete = False if user_to_delete["role"] == "Admin" else True
         self.assertFalse(can_delete)
 

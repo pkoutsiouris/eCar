@@ -5,7 +5,6 @@ import classes
 
 def ConnectDB():
     try:
-        # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -107,7 +106,6 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         conditions = []
         values = []
 
-        # Μαζεύουμε όσα φίλτρα έδωσε ο χρήστης
         if price is not None:
             conditions.append("price = %s")
             values.append(price)
@@ -121,13 +119,12 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
             conditions.append("horsepower = %s")
             values.append(horses)
 
-        # Αν υπάρχει έστω και ένα φίλτρο, τα ενώνουμε αυτόματα με " AND "
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
             
         query += ";"
         
-        # Η execute αναλαμβάνει να βάλει τις τιμές με ασφάλεια στη θέση των %s
+
         db.execute(query, tuple(values))
         cars = db.fetchall()
         return cars
@@ -141,7 +138,6 @@ def FilterCars(price: float, year: int, cc: int , horses: int):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
-# Συναρτήσεις επεξεργασίας στοιχείων αυτοκινήτου (για dealer)
 def ChangeCarDescr(car : classes.Car, new_desc: str):
     try:
         conn,db = ConnectDB()
@@ -210,7 +206,6 @@ def ChangeCarState(car : classes.Car):
             print("Car doesn't exist")  
             return False
         
-        # Ο dealer μόνο σε unavailable θα μπορεί να αλλάξει το state
         query="update cars set state='Unavailable' where license_plate=%s"
         db.execute(query, [car.plate])
         conn.commit()
@@ -238,7 +233,7 @@ def CheckUserExists(user: classes.User):
         else:
             return True
     except mysql.connector.Error as err:
-        print(f"Σφάλμα σύνδεσης με τη βάση (checkuserexists): {err}")
+        print(f"Error in connection with sql base (checkuserexists): {err}")
         return None
     finally:
         if 'db' in locals() and db is not None:
@@ -303,8 +298,7 @@ def ChangePassword(user: classes.User, new_password: str):
 def GiveDealerAccess(email: str):
     try:
         conn, db = ConnectDB()
-        
-        # 1. Ψάχνουμε να δούμε αν υπάρχει ο χρήστης
+
         check_query = "SELECT user_role FROM users WHERE email = %s"
         db.execute(check_query, (email,))
         user = db.fetchone()
@@ -316,8 +310,7 @@ def GiveDealerAccess(email: str):
         if user['user_role'] == 'Dealer':
             print(f"Ενημέρωση: Ο χρήστης {email} είναι ΗΔΗ Dealer! Δεν χρειάζεται αλλαγή.")
             return True
-        
-        # 2. Εφόσον υπάρχει και ΔΕΝ είναι Dealer, του αλλάζουμε ρόλο!
+
         update_query = "UPDATE users SET user_role = 'Dealer' WHERE email = %s"
         db.execute(update_query, (email,))
         conn.commit()
@@ -338,22 +331,20 @@ def GiveAdminAccess(email: str):
     try:
         conn, db = ConnectDB()
         
-        # 1. Ψάχνουμε να δούμε αν υπάρχει ο χρήστης
+
         check_query = "SELECT user_role FROM users WHERE email = %s"
         db.execute(check_query, (email,))
         user = db.fetchone()
-        
-        # Αν η βάση επιστρέψει None, ο χρήστης δεν υπάρχει!
+
         if user is None:
             print(f"Προσοχή: Δεν βρέθηκε χρήστης με το email {email}.")
             return False
             
-        # Αν υπάρχει, ελέγχουμε τον τωρινό του ρόλο
+
         if user['user_role'] == 'Admin':
             print(f"Ενημέρωση: Ο χρήστης {email} είναι ΗΔΗ Admin! Δεν χρειάζεται αλλαγή.")
             return True
-        
-        # 2. Εφόσον υπάρχει και ΔΕΝ είναι Admin, τον αναβαθμίζουμε!
+
         update_query = "UPDATE users SET user_role = 'Admin' WHERE email = %s"
         db.execute(update_query, (email,))
         conn.commit()
@@ -379,15 +370,15 @@ def DeleteCar(car: classes.Car):
             return False
            
         query = "DELETE FROM cars WHERE license_plate=%s"
-        # ΔΙΟΡΘΩΣΗ 1 & 2: Μπήκε το car.plate και το κόμμα (,)
+
         db.execute(query, (car.plate,))
         conn.commit()
 
-        print(f"Επιτυχία: Το αυτοκίνητο {car.plate} διαγράφηκε.")
+        print(f"Success: The car {car.plate} deleted.")
         return True
 
     except Exception as err:
-        # ΔΙΟΡΘΩΣΗ 3: Μπήκε το f-string
+
         print(f"Σφάλμα κατά τη διαγραφή: {err}")   
         return False
     finally:
@@ -406,7 +397,7 @@ def GetSortedCars(sort_by: str, descending: bool = False):
             "cc": "cc"
         }
         if sort_by not in valid_columns:
-            print(f"Προσοχή: Μη έγκυρο κριτήριο ταξινόμησης '{sort_by}'.")
+            print(f"Error: Μη έγκυρο κριτήριο ταξινόμησης '{sort_by}'.")
             return None
         
         db_column = valid_columns[sort_by]
@@ -549,7 +540,6 @@ def DeleteReservation(reservation_id: int):
     try:
         conn, db = ConnectDB() 
 
-        # 1. Ελέγχουμε αν υπάρχει η κράτηση
         check_query = "SELECT * FROM reservations WHERE reservation_id = %s"
         db.execute(check_query, (reservation_id,))
         res = db.fetchone()
@@ -558,7 +548,7 @@ def DeleteReservation(reservation_id: int):
             print(f"Error: The reservation with ID {reservation_id} not found.")  
             return False
             
-        # 2. Προχωράμε στη διαγραφή
+
         delete_query = "DELETE FROM reservations WHERE reservation_id = %s"
         db.execute(delete_query, (reservation_id,))
         conn.commit()

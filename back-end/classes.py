@@ -31,13 +31,10 @@ class Car:
         self.imgPath=imgPath
         self.availability=availability
         self.price=price
-    
- 
- # Η κύρια συνάρτηση που τρέχει το πρόγραμμα
-def main():
-    print("Ξεκινάει η εφαρμογή...\n")
 
-    # 2. Κλήση της μεθόδου που μιλάει με τη Βάση Δεδομένων (MySQL)
+def main():
+    print("App starting...\n")
+
     print("\nΓίνεται κλήση στη βάση δεδομένων...")
     """try:
 
@@ -80,27 +77,26 @@ def main():
             print(f" -> Email: {u['email']} | Ρόλος: {u['user_role']}")
 
 
-        print("--- ΤΕΣΤ 2: GiveAdminAccess ---")
+        print("--- Test 2: GiveAdminAccess ---")
         test_email1="panagikat@yahoo.com"
         test_email = "marisa@test.com" #email που δεν εχει καταχωρηθει
         functions.GiveAdminAccess(test_email1)
         functions.GiveAdminAccess(test_email)
 
 
-        print("--- ΤΕΣΤ 3: Επιβεβαίωση (Ξανά GetUsers) ---")
+        print("--- Test 3: Επιβεβαίωση  ---")
         all_users_again = functions.GetUsers()
         for u in all_users_again:
             if u['email'] == test_email1:
                 print(f"Ο νέος ρόλος του {u['email']} στη βάση είναι πλέον: {u['user_role']}")
 
 
-        print("--- ΤΕΣΤ 4: GiveDealerAccess ---")
+        print("--- Test 4: GiveDealerAccess ---")
         functions.GiveDealerAccess(test_email)
 
 
 # Δοκιμή Δημιουργίας χρήστη
     try:
-        # Δημιουργούμε το αντικείμενο στη μνήμη
         new_customer = User(
         username="oti nanai250",  
         password="5n47/Rb", 
@@ -214,6 +210,5 @@ def main():
     except Exception as e:
         print(f"Σφάλμα κατά την εκτέλεση του τεστ στη main: {e}")
 
-# Αυτό εξασφαλίζει ότι η main() τρέχει μόνο όταν εκτελείς αυτό το αρχείο απευθείας
 if __name__ == "__main__":
     unittest.main() 
