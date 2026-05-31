@@ -19,7 +19,6 @@ class AdminWindow(QMainWindow):
         self.setWindowIcon(QIcon('assets/icon.png'))
         self.resize(1280, 820)
 
-        # Main Central Widget με gradient background όπως το MainDashboard
         outer = QWidget()
         self.setCentralWidget(outer)
         outer_layout = QVBoxLayout(outer)
@@ -43,9 +42,7 @@ class AdminWindow(QMainWindow):
         shell_layout.setSpacing(0)
         outer_layout.addWidget(app_shell)
 
-        # =========================
-        # SIDEBAR (Layout από main_user.py)
-        # =========================
+        # SIDEBAR 
         sidebar = QFrame()
         sidebar.setFixedWidth(220)
         sidebar.setStyleSheet("""
@@ -116,9 +113,7 @@ class AdminWindow(QMainWindow):
 
         shell_layout.addWidget(sidebar)
 
-        # =========================
-        # MAIN CONTENT (Stacked Widget)
-        # =========================
+        # MAIN CONTENT(Stacked Widget)
         self.pages = QStackedWidget()
         shell_layout.addWidget(self.pages)
 
@@ -179,7 +174,6 @@ class AdminWindow(QMainWindow):
                 self.user_table.setItem(row_idx, 1, QTableWidgetItem(f"{user['first_name']} {user['surname']}"))
                 self.user_table.setItem(row_idx, 2, QTableWidgetItem(user['email']))
                 
-                # --- ΔΗΜΙΟΥΡΓΙΑ COMBOBOX (SCROLLER) ΓΙΑ ΤΟ ΡΟΛΟ ---
                 role_combo = QComboBox()
                 roles = ["Customer", "Dealer", "Admin"]
                 role_combo.addItems(roles)
@@ -188,7 +182,7 @@ class AdminWindow(QMainWindow):
                 role_combo.setStyleSheet("color: white; padding: 5px;")
                 self.user_table.setCellWidget(row_idx, 3, role_combo)
                 
-                # --- ACTIONS LAYOUT ---
+                # ACTIONS LAYOUT
                 actions_widget = QWidget()
                 actions_layout = QHBoxLayout(actions_widget)
                 actions_layout.setContentsMargins(2, 2, 2, 2)
@@ -196,10 +190,9 @@ class AdminWindow(QMainWindow):
                 # ΚΟΥΜΠΙ APPLY
                 btn_apply = QPushButton("Apply")
                 btn_apply.setStyleSheet("background: #3b82f6; color: white; border-radius: 5px; padding: 5px;")
-                # Σύνδεση με τη νέα μέθοδο apply_role_change
                 btn_apply.clicked.connect(lambda ch, e=user['email'], c=role_combo: self.apply_role_change(e, c))
 
-                # Κουμπί Delete
+                # ΚΟΥΜΠΙ Delete
                 btn_del = QPushButton("Delete")
                 btn_del.setStyleSheet("background: #ef4444; color: white; border-radius: 5px; padding: 5px;")
                 btn_del.clicked.connect(lambda ch, r=row_idx: self.delete_user(r))
@@ -258,7 +251,7 @@ class AdminWindow(QMainWindow):
 
         layout.addLayout(button_layout)
 
-        # --- Scroll area ---
+        # Scroll area
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
 
@@ -289,7 +282,7 @@ class AdminWindow(QMainWindow):
             except FileNotFoundError:
                 log_text.setText(f"{filename} not found.")
 
-        # --- Button actions ---
+        # Button actions
       
         logs_btn.clicked.connect(lambda: load_file("logs.txt"))
         errors_btn.clicked.connect(lambda: load_file("errlogs.txt"))
@@ -299,7 +292,6 @@ class AdminWindow(QMainWindow):
         return page
 
     def delete_user(self, row):
-        # 1. Παίρνουμε το email από τη στήλη 2 της συγκεκριμένης σειράς
         email_item = self.user_table.item(row, 2)
         if not email_item:
             return
