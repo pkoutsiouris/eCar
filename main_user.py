@@ -240,9 +240,9 @@ class MainDashboard(QMainWindow):
 
         outer_layout.addWidget(app_shell)
 
-        # =========================
+     
         # Sidebar
-        # =========================
+        
         sidebar = QFrame()
         sidebar.setFixedWidth(220)
         sidebar.setStyleSheet("""
@@ -346,12 +346,11 @@ class MainDashboard(QMainWindow):
 
         shell_layout.addWidget(sidebar)
 
-        # =========================
+     
         # Main content
-        # =========================
-        # =========================
-        # Main content (Η Στοίβα με τις σελίδες)
-        # =========================
+    
+        
+      
         self.stacked_widget = QStackedWidget()
         shell_layout.addWidget(self.stacked_widget)
 
@@ -440,9 +439,9 @@ class MainDashboard(QMainWindow):
         btn_logout.setMinimumHeight(46)
         btn_logout.clicked.connect(self.logout)
 
-        # =========================
-        # Date Picker Panel (shown before car grid)
-        # =========================
+        #===================
+        # Date Picker Panel 
+        #===================
         self.date_picker_panel = QFrame()
         self.date_picker_panel.setStyleSheet("""
             QFrame {
@@ -608,9 +607,9 @@ class MainDashboard(QMainWindow):
         content_layout.addWidget(self.date_picker_panel)
 
 
-        # =========================
-        # Cars panel (toolbar + grid) — hidden until dates are chosen
-        # =========================
+        # ==========
+        # Cars panel
+        # ==========
         self.cars_panel = QWidget()
         self.cars_panel.setStyleSheet("background-color: transparent;")
         cars_panel_layout = QVBoxLayout(self.cars_panel)
@@ -785,9 +784,9 @@ class MainDashboard(QMainWindow):
         self.settings_page = self.create_settings_page()
 
         # Βάζουμε τις 3 σελίδες στο QStackedWidget
-        self.stacked_widget.addWidget(self.dashboard_container) # Index 0
-        self.stacked_widget.addWidget(self.res_page)            # Index 1
-        self.stacked_widget.addWidget(self.settings_page)       # Index 2         # Index 1
+        self.stacked_widget.addWidget(self.dashboard_container)
+        self.stacked_widget.addWidget(self.res_page)            
+        self.stacked_widget.addWidget(self.settings_page)      
 
 
     
@@ -816,7 +815,7 @@ class MainDashboard(QMainWindow):
                 
                 self.right_info_label.setText(f"Showing <b>{len(cars_list)}</b> vehicles")
 
-# ALAGH AVAILABILITY
+        # Change in Availability
         row = 0
         col = 0
         for car in cars_list:
@@ -1199,7 +1198,7 @@ class MainDashboard(QMainWindow):
             font-weight: 700;
         """)
         return chip
-    def handle_rent(self, car): #NEW FUNC 
+    def handle_rent(self, car):
         from reservation_page import DatePickerDialog 
         # If dates are already selected from the dashboard search, skip the date picker
         if self.selected_start_date and self.selected_end_date:
@@ -1215,10 +1214,10 @@ class MainDashboard(QMainWindow):
         st = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
         days = (et - st).days
-        if days <= 0: days = 1 # Μίνιμουμ 1 μέρα χρέωση
+        if days <= 0: days = 1 # Min 1 day charge
         
         total_price = days * car['price']
-        # Αντί για CreateReservation, ανοίγουμε το PaymentWindow
+        
         from pay import PaymentWindow
         print("Car plate from main: ", car['license_plate'])
         self.payment_screen = PaymentWindow(self.session_email, start_str, end_str,car)
@@ -1226,7 +1225,7 @@ class MainDashboard(QMainWindow):
         self.close() # Κλείνουμε το dashboard όσο πληρώνει
 
     def show_car_details(self, car):
-        # Ανοίγει το custom popup που φτιάξαμε
+       
         dialog = CarDetailsDialog(car, self)
         dialog.exec()
 
@@ -1330,10 +1329,10 @@ class MainDashboard(QMainWindow):
 
         print("BASE_DIR IS ", BASE_DIR)
         
-        # 1. Add the .png extension to the car's image name
+        
         filename = f"{car['image_path']}.png"
 
-        # 2. Join BASE_DIR, the "imgs" folder, and the filename all together
+        
         full_path = os.path.join(BASE_DIR, "imgs", filename)
 
         print(full_path)
@@ -1346,7 +1345,7 @@ class MainDashboard(QMainWindow):
                 Qt.SmoothTransformation
             )
             
-            #car_image.setFixedSize(280, 210) 
+           
             car_image.setPixmap(scaled_pixmap)
             
         else:
