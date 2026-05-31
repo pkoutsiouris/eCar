@@ -9,7 +9,6 @@ def get_user_by_email(email):
     Επιστρέφει ένα λεξικό (dict) με τα στοιχεία του ή None αν δεν βρεθεί.
     """
     try:
-        # Προσοχή: Εδώ θα βάλετε τα δικά σας στοιχεία της MySQL
         conn,cursor = functions.ConnectDB()
         cursor = conn.cursor(dictionary=True)
         query = "SELECT user_id, email, user_password, user_role FROM users WHERE email = %s"
@@ -40,27 +39,23 @@ def is_valid_email(email):
     return False
 
 def authenticate_user(email, password):
-    """
-    Επιστρέφει 3 πράγματα: (Επιτυχία/Αποτυχία, Μήνυμα, Ρόλος)
-    """
+
     email = email.strip()
     password = password.strip()
 
-    # 1. Έλεγχος αν είναι κενά
+
     if not email or not password:
         return False, "Fill in both your email and password.", None
 
-    # 2. Έλεγχος μορφής email
     if not is_valid_email(email):
         return False, "Email not valid!(try ex. @gmail.com).", None
 
-    # 3. Ψάχνουμε τον χρήστη στη βάση μέσω του Model
+
     user = get_user_by_email(email) 
 
     if user is None:
         return False, "The user with this email address was not found.", None
 
-    # 4. Ελέγχουμε τον κωδικό
     if user['user_password'] == password:
         return True, "Connection Successful!", user['user_role']
     else:
