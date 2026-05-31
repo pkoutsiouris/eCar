@@ -357,19 +357,14 @@ class MainDealerWindow(QMainWindow):
         banner_layout.addLayout(self.stats_row)
 
         content_layout.addWidget(banner)
-
-        # --- ΑΛΛΑΓΗ: Το date_picker_panel ΔΕΝ προστίθεται πλέον στο layout, το προσπερνάμε ---
         self.date_picker_panel = QFrame() 
-        # (Κρατάμε το αντικείμενο στη μνήμη για να μη σπάσουν άλλες αναφορές, αλλά δεν το εμφανίζουμε)
 
-        # Cars Panel (Toolbar + Grid)
+        # Cars Panel(Toolbar + Grid)
         self.cars_panel = QWidget()
         self.cars_panel.setStyleSheet("background-color: transparent;")
         cars_panel_layout = QVBoxLayout(self.cars_panel)
         cars_panel_layout.setContentsMargins(0, 0, 0, 0)
         cars_panel_layout.setSpacing(0)
-        
-        # --- ΑΛΛΑΓΗ: Το δείχνουμε κατευθείαν ---
         self.cars_panel.show() 
 
         # Toolbar
@@ -424,9 +419,6 @@ class MainDealerWindow(QMainWindow):
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.right_info_label)
         toolbar_layout.addWidget(btn_filter)
-
-        # --- ΑΛΛΑΓΗ: Αφαιρέθηκε το κουμπί "Change Dates" αφού δεν χρειάζεται πλέον ---
-
         cars_panel_layout.addWidget(toolbar)
 
         # Scroll Area
@@ -457,8 +449,6 @@ class MainDealerWindow(QMainWindow):
         self.stacked_widget.addWidget(self.dashboard_container) 
         self.stacked_widget.addWidget(self.res_page)            
         self.stacked_widget.addWidget(self.settings_page)       
-
-        # --- ΑΛΛΑΓΗ: Φόρτωση όλων των αυτοκινήτων απευθείας κατά την εκκίνηση ---
         self.load_all_cars_immediately()
 
     def load_all_cars_immediately(self):
@@ -470,8 +460,6 @@ class MainDealerWindow(QMainWindow):
 
         self.stat_chip_cars.setText(f"{len(self.cars)} Cars")
         self.update_grid(self.cars)
-        
-        # Μετράμε πόσα είναι "Available" (ή "Reserved" / "Maintenance" κλπ)
         available_count = sum(1 for car in self.cars if car["state"] == "Available")
         self.right_info_label.setText(f"Showing <b>{len(self.cars)}</b> vehicles ({available_count} Available)")
 
@@ -491,7 +479,6 @@ class MainDealerWindow(QMainWindow):
                 
         row = 0
         col = 0
-        # --- ΑΛΛΑΓΗ: Εμφάνιση ΟΛΩΝ των αυτοκινήτων ανεξαρτήτως κατάστασης (δείχνει και Reserved) ---
         for car in cars_list:
             card = self.create_car_card(car)
             self.grid.addWidget(card, row, col)
@@ -675,7 +662,6 @@ class MainDealerWindow(QMainWindow):
         self.refresh_dashboard()
 
     def refresh_dashboard(self):
-        # --- ΑΛΛΑΓΗ: Όταν επιστρέφει στο Dashboard, απλά ξαναφορτώνει τα αυτοκίνητα αντί να κρύβει το panel ---
         self.load_all_cars_immediately()
     
     def make_sidebar_button(self, text, checked=False):
@@ -724,7 +710,6 @@ class MainDealerWindow(QMainWindow):
         name_wrap.addWidget(title)
         name_wrap.addWidget(subtitle)
 
-        # Δυναμικό Χρώμα ανάλογα με το Availability (State)
         status_badge = QLabel(car["state"])
         if car["state"] == "Available":
             status_style = "background-color: #eafaf0; color: #1f9d55;"
