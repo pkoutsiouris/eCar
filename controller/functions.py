@@ -1,10 +1,9 @@
 from datetime import datetime
 import mysql.connector
 import os
-#import classes
-from back_end import classes
-from back_end.session import session
-from back_end import authentication
+from controller import classes
+from controller.session import session
+from controller import authentication
 
 def WriteErrorLog(funcname: str, err: str):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +26,7 @@ def WriteLog(funcname: str, msg: str):
 
     print("Path from write log:", full_path)
 
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)  # safety
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)  
 
     with open(full_path, "a", encoding="utf-8") as f:
         f.write(f"{timestamp} - {msg} ({funcname})\n")
@@ -71,10 +70,6 @@ def CheckCarExists(plate):
         conn.close()
 
 def GetAvailableCarsByDates(start_date: str, end_date: str):
-    """
-    Returns cars that are in 'Available' state AND have no overlapping
-    confirmed/pending reservations in the given date range.
-    """
     try:
         conn, db = ConnectDB()
         query = """
@@ -181,7 +176,6 @@ def FilterCars(price: float, year: int, cc: int, horses: int, start_date: str = 
             query += " AND horsepower >= %s"
             params.append(horses)
 
-        # Filter by date availability if dates are provided
         if start_date and end_date:
             query += " AND state = 'Available'"
             query += """
@@ -468,12 +462,8 @@ def CreateReservation(email:str,start_date, end_date,car_id):
         conn, db = ConnectDB()
         user = GetUserSession(email)
         car=GetCarbyID(car_id)
-       # car = GetCarByLicense(car_plate)
-        #print("the car id is: "+car['car_id'])
         st = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
         et = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
-        """ st_str = st.strftime("%Y-%m-%d %H:%M")
-        et_str = et.strftime("%Y-%m-%d %H:%M") """
         duration = (et - st).days
         print("Duration is: ",duration)
         rate= float(car["price"])
@@ -486,7 +476,6 @@ def CreateReservation(email:str,start_date, end_date,car_id):
         query = "INSERT INTO reservations (car_id, user_id, start_date, end_date, total_price, reservation_status) VALUES (%s, %s, %s, %s, %s, %s)"
         db.execute(query,(car_id,user["user_id"],st,et,total_price,reservation_status))
         conn.commit()
-        # Do NOT change car state — availability is determined dynamically via date overlap
         msg = f"Created reservation for user {email}, car_id {car_id}, from {start_date} to {end_date}"
         WriteLog("CreateReservation", msg)
         return True

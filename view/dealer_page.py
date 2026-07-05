@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from back_end import functions, classes
+from controller import classes, functions
 
 class DealerWindow(QMainWindow):
     def __init__(self, session_email: str):
@@ -569,7 +569,7 @@ class DealerWindow(QMainWindow):
                 else:
                     QMessageBox.warning(self, "Error", "Could not delete vehicle. It might be linked to a reservation.")
             else:
-                QMessageBox.critical(self, "System Error", "Function 'DeleteCar' not found in back_end.functions")
+                QMessageBox.critical(self, "System Error", "Function 'DeleteCar' not found in controller.functions")
 
     def logout(self):
         from login import LoginWindow

@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QDialog, QFormLayout, QLineEdit, QStackedWidget, QComboBox, QDateEdit
 )
 from PySide6.QtCore import Qt, QTimer, QDate
-from back_end import functions
+from controller import functions
 from datetime import datetime
 from PySide6.QtGui import QPixmap, QIcon
 

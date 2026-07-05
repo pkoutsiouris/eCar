@@ -10,12 +10,11 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QIcon, QAction, QFontDatabase
-from back_end import authentication as auth
+from controller import authentication as auth
 from main_user import MainDashboard
 from dealer_page import DealerWindow
-from back_end.session import session
-#TODO: Custom font
-#QtGui.QFontDatabase.addApplicationFont('assets/fonts/Modern_Mono.otf')
+from controller.session import session
+
 
 
 class ResizableLogo(QLabel):

@@ -1,13 +1,9 @@
 import mysql.connector
-from back_end import classes
-from  back_end import functions 
+from controller import classes
+from  controller import functions 
 
 
 def get_user_by_email(email):
-    """
-    Ψάχνει στη βάση δεδομένων να βρει τον χρήστη με το συγκεκριμένο email.
-    Επιστρέφει ένα λεξικό (dict) με τα στοιχεία του ή None αν δεν βρεθεί.
-    """
     try:
         conn,cursor = functions.ConnectDB()
         cursor = conn.cursor(dictionary=True)
@@ -26,7 +22,6 @@ def get_user_by_email(email):
         return None
     
 def is_valid_email(email):
-    """Ελέγχει αν το email έχει σωστή μορφή (Business Logic)."""
     email = email.strip().lower()
     allowed_domains = ["@gmail.com", "@yahoo.com", "@hotmail.com", "@outlook.com", "@hotmail.com"]
     

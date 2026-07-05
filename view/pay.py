@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QFrame, QMessageBox, QHBoxLayout)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
-from back_end import classes
+from controller import classes
 class PaymentWindow(QWidget):
     
 
@@ -119,7 +119,7 @@ class PaymentWindow(QWidget):
             QMessageBox.warning(self, "Error", "Invalid card details.")
             return
 
-        from back_end import functions
+        from controller import functions
         try:
             print("Car ID: "+ str(self.car_data['car_id']))
             functions.CreateReservation(self.session_email, self.start_date, self.end_date, str(self.car_data['car_id']))

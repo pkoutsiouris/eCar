@@ -1,4 +1,4 @@
-from back_end import classes
+from controller import classes
 
 class User:
     def __init__(self,username:str,password: str, role: str, firstname: str ,

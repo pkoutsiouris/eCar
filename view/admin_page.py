@@ -1,5 +1,6 @@
 import sys
 import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QScrollArea, QFrame, QTableWidget, 
@@ -9,7 +10,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QComboBox
 
-from back_end import functions
+from controller import functions
 
 class AdminWindow(QMainWindow):
     def __init__(self, session_email: str):
@@ -211,7 +212,7 @@ class AdminWindow(QMainWindow):
             print(f"Successfully updated {email} to {new_role}")
         else:
             print(f"Failed to update role for {email}")
-    """     def create_logs_page(self):#TODO
+    """     def create_logs_page(self):
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0,0,0,0)
@@ -233,7 +234,7 @@ class AdminWindow(QMainWindow):
         """
 
     def create_logs_page(self):
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # -> logismik/
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
         page = QWidget()
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -276,7 +277,7 @@ class AdminWindow(QMainWindow):
         logs_btn.clicked.connect(lambda: load_file("logs.txt"))
         errors_btn.clicked.connect(lambda: load_file("errlogs.txt"))
 
-        load_file("logs.txt")  # populate on page open
+        load_file("logs.txt")  
         return page
     
     def delete_user(self, row):

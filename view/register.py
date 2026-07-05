@@ -6,8 +6,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QFrame, QMessageBox, QStyle)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QIcon, QAction
-from back_end import functions as functions
-from back_end import classes as classes 
+from controller import functions as functions
+from controller import classes as classes 
 from login import LoginWindow
 
 class RegisterWindow(QWidget):
